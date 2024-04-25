@@ -58,10 +58,11 @@ alias srmt='sudo trash-put'
 # FILE SIZE AND STORAGE
 alias fdisk='sudo fdisk -l'
 alias uuid='sudo vol_id -u'
-alias ls='ls -F --color=auto --group-directories-first'
-alias ll='ls -alh --color=auto --group-directories-first'
-alias lt='ls --human-readable --color=auto --size -1 -S --classify' # file size sorted
-alias lsr='ls --color=auto -t -1' # recently modified
+alias ls='eza'
+# alias ls='ls -F --color=auto --group-directories-first'
+# alias ll='ls -alh --color=auto --group-directories-first'
+# alias lt='ls --human-readable --color=auto --size -1 -S --classify' # file size sorted
+# alias lsr='ls --color=auto -t -1' # recently modified
 alias mnt='mount | grep -E ^/dev | column -t' # show mounted drives
 alias dirsize='sudo du -hx --max-depth=1'
 alias dirusage='du -ch | grep total' # Grabs the disk usage in the current directory
@@ -91,3 +92,25 @@ alias restartdocker='sudo synosystemctl restart pkgctl-Docker'
 # MISCELLANEOUS
 alias wget='wget -c'
 alias nano='sudo nano -iSw$'
+
+
+# Use fzf to enhance the 'cd' command with fuzzy finding capabilities
+fcd() {
+  local dir
+  dir=$(find ${1:-.} -type d -not -path '*/\.*' 2> /dev/null | fzf +m) && cd "$dir"
+}
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+
+alias cat='bat'
+alias top='htop'
+
+# For trash-cli and other apps (usually from pip)
+export PATH="$PATH:$HOME/.local/bin"
+
+# fzf Fuzzer
+export PATH="$HOME/.fzf/bin:$PATH"
+
+# Rust (for eza)
+export PATH="$HOME/.cargo/bin:$PATH"

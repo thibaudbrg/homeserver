@@ -1,5 +1,3 @@
-version: "3.9"
-
 ########################### SYSTEM DESCRIPTION
 # DOCKER-COMPOSE FOR SYNOLOGY DS920+
 # 20 GB RAM, DSM 7.X
@@ -18,8 +16,7 @@ version: "3.9"
 # - Run plextraktsync for the first time in docker-compose-t2.yml
 #       sudo COMPOSE_HTTP_TIMEOUT=200 docker-compose -f docker-compose-t2.yml run --rm plextraktsync
 # - If wg-easy cannot start, then stop the Wireguard app package in Package Center (Synology),
-#       start the container and then start the app. If the app doesn't start from the package manager
-#       GUI then run: sudo /var/packages/WireGuard/scripts/start
+#       start the container and then start the app.
 # - To execute new app to start in nextcloud (where 26.......b1 is the id of the Nextcloud container)
 #       sudo docker exec -it -u 1026 26097adc23b1 php /app/www/public/occ app:enable name_of_the_app
 
@@ -71,6 +68,8 @@ networks:
     ipam:
       config:
         - subnet: 192.168.97.0/24
+
+
 
 ########################### SECRETS
 secrets:
@@ -128,46 +127,6 @@ secrets:
     file: $DOCKERDIR/secrets/postgres_password
   postgres_db:
     file: $DOCKERDIR/secrets/postgres_db
-
-
-########################### EXTENSION FIELDS
-# Helps eliminate repetition of sections
-# More Info on how to use this: https://github.com/htpcBeginner/docker-traefik/pull/228
-
-# Common environment values
-x-environment: &default-tz-puid-pgid # WARNING Work (normally) only for linuxservers.io apps
-  TZ: $TZ
-  PUID: $PUID
-  PGID: $PGID
-
-# Proxy Network and Security
-x-network-and-security: &network-and-security
-  networks:
-    - t2_proxy
-  security_opt:
-    - no-new-privileges:true
-
-# Keys common to some of the services in basic-services.txt
-x-common-keys-core: &common-keys-core
-  <<: *network-and-security
-  restart: always
-  # profiles:
-  # - core
-
-# Keys common to some of the dependent services/apps
-x-common-keys-apps: &common-keys-apps
-  <<: *network-and-security
-  restart: unless-stopped
-  # profiles:
-  # - apps
-
-# Keys common to some of the services in media-services.txt
-x-common-keys-media: &common-keys-media
-  <<: *network-and-security
-  restart: "no"
-  # profiles:
-  # - media
-
 
 include:
   # CORE SERVICES
