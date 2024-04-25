@@ -11,7 +11,9 @@ services:
       llm:
         ipv4_address: 192.168.95.162
     environment:
-      <<: *default-tz-puid-pgid
+      TZ: $TZ
+      PUID: $PUID
+      PGID: $PGID
       IS_PERSISTENT: "true"
       ALLOW_RESET: "true"
       CHROMA_SERVER_AUTH_CREDENTIALS: 9aB3xP78QvT4zG6hJkL0MnOp
