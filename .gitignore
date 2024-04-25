@@ -1,0 +1,58 @@
+# General
+.DS_Store
+._.DS_Store
+._DAV
+Thumbs.db
+*.log
+*.tmp
+node_modules/
+
+# Jetbrains / IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+
+# Environment variables and secrets
+.env
+.env.*
+
+# Docker
+docker-compose.override.yml
+
+# NAS specific
+@eaDir/
+
+# Application Data
+appdata/*/
+!appdata/*/
+appdata/*/.gitkeep  # Track .gitkeep in each directory
+
+# Docker Secrets
+secrets/
+!secrets/
+secrets/.gitkeep
+
+# Archives
+archive/*/
+!archive/*/
+archive/*/.gitkeep  # Track .gitkeep in each directory
+
+# Operating System generated files
+ehthumbs.db
+Icon?
+
+# Python caches
+__pycache__/
+*.pyc
+
+# Compiled Source
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Backup & Log files
+*~
+*.swp
