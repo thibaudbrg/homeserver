@@ -1,0 +1,241 @@
+version: "3.9"
+
+########################### SYSTEM DESCRIPTION
+# DOCKER-COMPOSE FOR SYNOLOGY DS920+
+# 20 GB RAM, DSM 7.X
+# 1x18TB
+
+########################### NETWORKS
+# There is no need to create any networks outside this docker-compose file.
+# You may customize the network subnets (192.168.90.0/24 and 91.0/24) below as you please.
+# Docker Compose version 3.5 or higher required to define networks this way.
+
+########################### USEFUL COMMANDS
+# - To run the docker-compose file
+#       sudo COMPOSE_HTTP_TIMEOUT=200 docker-compose -f /volume1/docker/docker-compose-t2.yml up -d
+# - To see the logs of a process
+#       sudo docker logs -tf --tail="50" <process-name>
+# - Run plextraktsync for the first time in docker-compose-t2.yml
+#       sudo COMPOSE_HTTP_TIMEOUT=200 docker-compose -f docker-compose-t2.yml run --rm plextraktsync
+# - If wg-easy cannot start, then stop the Wireguard app package in Package Center (Synology),
+#       start the container and then start the app. If the app doesn't start from the package manager
+#       GUI then run: sudo /var/packages/WireGuard/scripts/start
+# - To execute new app to start in nextcloud (where 26.......b1 is the id of the Nextcloud container)
+#       sudo docker exec -it -u 1026 26097adc23b1 php /app/www/public/occ app:enable name_of_the_app
+
+########################### WEBSITE TUTORIAL SMARTHOMEBEGINNER
+# https://www.smarthomebeginner.com/traefik-docker-compose-guide-2022/
+
+networks:
+  t2_proxy:
+    name: t2_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.90.0/24
+  default:
+    driver: bridge
+  socket_proxy:
+    name: socket_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.91.0/24
+  nextcloud:
+    name: nextcloud
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.92.0/24
+  wg-easy:
+    name: wg-easy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.93.0/24
+  llm:
+    name: llm
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.95.0/24
+  photoprism:
+    name: photoprism
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.96.0/24
+  filebrowser:
+    name: filebrowser
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.97.0/24
+
+########################### SECRETS
+secrets:
+  htpasswd:
+    file: $DOCKERDIR/secrets/htpasswd
+  cloudflare_email:
+    file: $DOCKERDIR/secrets/cloudflare_email
+  cloudflare_api_key:
+    file: $DOCKERDIR/secrets/cloudflare_api_key
+  cloudflare_api_token:
+    file: $DOCKERDIR/secrets/cloudflare_api_token
+  cf_email:
+    file: $DOCKERDIR/secrets/cf_email
+  cf_token:
+    file: $DOCKERDIR/secrets/cf_token
+  oauth_secret:
+    file: $DOCKERDIR/secrets/oauth_secret
+  authelia_jwt_secret:
+    file: $DOCKERDIR/secrets/authelia_jwt_secret
+  authelia_session_secret:
+    file: $DOCKERDIR/secrets/authelia_session_secret
+  authelia_storage_mysql_password:
+    file: $DOCKERDIR/secrets/authelia_storage_mysql_password
+  authelia_notifier_smtp_password:
+    file: $DOCKERDIR/secrets/authelia_notifier_smtp_password
+  authelia_duo_api_secret_key:
+    file: $DOCKERDIR/secrets/authelia_duo_api_secret_key
+  authelia_storage_encryption_key:
+    file: $DOCKERDIR/secrets/authelia_storage_encryption_key
+  authelia_session_redis_password:
+    file: $DOCKERDIR/secrets/authelia_session_redis_password
+  mysql_root_password:
+    file: $DOCKERDIR/secrets/mysql_root_password
+  db_password:
+    file: $DOCKERDIR/secrets/db_password
+  db_root_password:
+    file: $DOCKERDIR/secrets/db_root_password
+  guac_db_name:
+    file: $DOCKERDIR/secrets/guac_db_name
+  guac_mysql_user:
+    file: $DOCKERDIR/secrets/guac_mysql_user
+  guac_mysql_password:
+    file: $DOCKERDIR/secrets/guac_mysql_password
+  #  google_client_secret:
+  #    file: $DOCKERDIR/secrets/google_client_secret
+  #  google_client_id:
+  #    file: $DOCKERDIR/secrets/google_client_id
+  #  my_email:
+  #    file: $DOCKERDIR/secrets/my_email
+  plex_claim:
+    file: $DOCKERDIR/secrets/plex_claim
+  postgres_user:
+    file: $DOCKERDIR/secrets/postgres_user
+  postgres_password:
+    file: $DOCKERDIR/secrets/postgres_password
+  postgres_db:
+    file: $DOCKERDIR/secrets/postgres_db
+
+
+########################### EXTENSION FIELDS
+# Helps eliminate repetition of sections
+# More Info on how to use this: https://github.com/htpcBeginner/docker-traefik/pull/228
+
+# Common environment values
+x-environment: &default-tz-puid-pgid # WARNING Work (normally) only for linuxservers.io apps
+  TZ: $TZ
+  PUID: $PUID
+  PGID: $PGID
+
+# Proxy Network and Security
+x-network-and-security: &network-and-security
+  networks:
+    - t2_proxy
+  security_opt:
+    - no-new-privileges:true
+
+# Keys common to some of the services in basic-services.txt
+x-common-keys-core: &common-keys-core
+  <<: *network-and-security
+  restart: always
+  # profiles:
+  # - core
+
+# Keys common to some of the dependent services/apps
+x-common-keys-apps: &common-keys-apps
+  <<: *network-and-security
+  restart: unless-stopped
+  # profiles:
+  # - apps
+
+# Keys common to some of the services in media-services.txt
+x-common-keys-media: &common-keys-media
+  <<: *network-and-security
+  restart: "no"
+  # profiles:
+  # - media
+
+
+include:
+  # CORE SERVICES
+  - compose/traefik.yml
+  - compose/socket-proxy.yml
+  - compose/authelia.yml
+  - compose/portainer.yml
+
+  # MONITORING & LOGGING
+  - compose/dozzle.yml
+  - compose/glances.yml
+  - compose/qdirstat.yml
+
+  # REMOTE ACCESS & SECURITY
+  - compose/guacamole.yml
+  - compose/guacd.yml
+  - compose/code-server.yml
+  - compose/wg-easy.yml
+
+  # DATA & FILE MANAGEMENT
+  - compose/vaultwarden.yml
+  - compose/nextcloud.yml
+  - compose/redis.yml
+  - compose/rediscommander.yml
+  - compose/filebrowser.yml
+  - compose/photoprism.yml
+  - compose/qdrant.yml
+  - compose/mariadb.yml
+  - compose/phpmyadmin.yml
+
+  # MEDIA SERVERS
+  - compose/plexms.yml
+  - compose/plextraktsync.yml
+  - compose/tautulli.yml
+  - compose/overseerr.yml
+
+  # MEDIA DOWNLOADERS
+  - compose/transmission-vpn.yml
+  - compose/nzbget.yml
+  - compose/sabnzbd.yml
+
+  # MEDIA INDEXERS
+  - compose/radarr.yml
+  - compose/sonarr.yml
+  - compose/readarr.yml
+  - compose/lidarr.yml
+  - compose/bazarr.yml
+  - compose/prowlarr.yml
+  - compose/flaresolverr.yml
+
+  # MEDIA UTILITIES
+  - compose/notifiarr.yml
+
+  # MEDIA CONVERSION TOOLS
+  - compose/tdarr.yml
+  - compose/tdarr-node1.yml
+  - compose/makemkv.yml
+  - compose/mkvtoolnix.yml
+  - compose/handbrake.yml
+
+  # SYSTEM MAINTENANCE
+  - compose/watchtower.yml
+  - compose/ofelia.yml
+  - compose/dockergc.yml
+  - compose/cf-companion.yml
+
+  # AI & MACHINE LEARNING
+  - compose/anything-llm.yml
+
+  # DASHBOARD
+  - compose/homarr.yml

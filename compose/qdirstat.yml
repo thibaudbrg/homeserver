@@ -1,0 +1,35 @@
+services:
+  # qDirStat - Directory Statistics
+  qdirstat:
+    image: jlesage/qdirstat:latest
+    container_name: qdirstat
+    restart: "no"
+    # ports:
+    #   - "$QDIRSTAT_PORT:5800"
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /volume1:/storage:ro
+      - $DOCKERDIR/appdata/qdirstat/config:/config:rw
+    environment:
+      USER_ID: $PUID
+      GROUP_ID: $PGID
+      UMASK: 002
+      TZ: $TZ
+      KEEP_APP_RUNNING: 1
+      CLEAN_TMP_DIR: 1
+      DISPLAY_WIDTH: 1600
+      DISPLAY_HEIGHT: 960
+      VNC_PASSWORD: $QDIRSTAT_VNC_PASSWD
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.qdirstat-rtr.entrypoints=https"
+      - "traefik.http.routers.qdirstat-rtr.rule=Host(`qdirstat.$DOMAINNAME0`)"
+      ## Middlewares
+      - "traefik.http.routers.qdirstat-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.qdirstat-rtr.service=qdirstat-svc"
+      - "traefik.http.services.qdirstat-svc.loadbalancer.server.port=5800"

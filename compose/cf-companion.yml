@@ -1,0 +1,28 @@
+services:
+  # Cloudflare-Companion - Automatic CNAME DNS Creation
+  cf-companion:
+    container_name: cf-companion
+    image: tiredofit/traefik-cloudflare-companion:latest
+    restart: unless-stopped
+    networks:
+      - t2_proxy
+      - socket_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - TIMEZONE=$TZ
+      - TRAEFIK_VERSION=2
+      #- CF_EMAIL=$CLOUDFLARE_EMAIL # Not needed
+      #- CF_TOKEN=$CLOUDFLARE_API_TOKEN # Use docker secrets instead
+      - CF_TOKEN_FILE=/run/secrets/cf_token
+      - TARGET_DOMAIN=$DOMAINNAME0 # Edit this. Either a subdomain or just $DOMAINNAME0 pointing to the IP will work. See: https://github.com/htpcBeginner/docker-traefik/issues/244.
+      - DOMAIN1=$DOMAINNAME0
+      - DOMAIN1_ZONE_ID=$CLOUDFLARE_ZONEID # Copy from Cloudflare Overview page
+      - DOMAIN1_PROXIED=TRUE
+      - DOCKER_HOST=tcp://socket-proxy:2375
+    secrets:
+      - cf_token # must have this particular name
+      #labels:
+      # Add hosts specified in rules here to force cf-companion to create the CNAMEs
+      # Since cf-companion creates CNAMEs based on host rules, this a workaround for non-docker/external apps
+      #- "traefik.http.routers.cf-companion-rtr.rule=Host(`webminh.$DOMAINNAME0`) || Host(`shellh.$DOMAINNAME0`) || Host(`syno.$DOMAINNAME0`) || Host(`ibox.$DOMAINNAME0`) || Host(`synplex.$DOMAINNAME0`) || Host(`pirpi.$DOMAINNAME0`) || Host(`pidoc.$DOMAINNAME0` || Host(`stpc.$DOMAINNAME0`)"

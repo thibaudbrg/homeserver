@@ -1,0 +1,41 @@
+services:
+  # Radarr - Movie management
+  # Set url_base in radarr settings if using PathPrefix
+  radarr:
+    image: lscr.io/linuxserver/radarr:nightly # latest was causing "Error parsing column 45"
+    container_name: radarr
+    restart: unless-stopped
+    networks:
+      t2_proxy:
+        ipv4_address: 192.168.90.164
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "$RADARR_PORT:7878"
+    volumes:
+      - $DOCKERDIR/appdata/radarr:/config
+      # Optional. See why MediaCover is mounted as volume https://github.com/htpcBeginner/docker-traefik/discussions/147
+      #- $DATADIR/temp/appdata/radarr/MediaCover:/config/MediaCover
+      - $DATADIR/:/data/
+      - "/etc/localtime:/etc/localtime:ro"
+    environment:
+      TZ: $TZ
+      PUID: $PUID
+      PGID: $PGID
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth Bypass
+      - "traefik.http.routers.radarr-rtr-bypass.entrypoints=https"
+      - "traefik.http.routers.radarr-rtr-bypass.rule=Host(`radarr.$DOMAINNAME0`) && (Headers(`X-Api-Key`, `$RADARR_API_KEY`) || Query(`apikey`, `$RADARR_API_KEY`))"
+      - "traefik.http.routers.radarr-rtr-bypass.priority=100"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.radarr-rtr.entrypoints=https"
+      - "traefik.http.routers.radarr-rtr.rule=Host(`radarr.$DOMAINNAME0`)"
+      - "traefik.http.routers.radarr-rtr.priority=99"
+      ## Middlewares
+      - "traefik.http.routers.radarr-rtr-bypass.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.radarr-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.radarr-rtr.service=radarr-svc"
+      - "traefik.http.routers.radarr-rtr-bypass.service=radarr-svc"
+      - "traefik.http.services.radarr-svc.loadbalancer.server.port=7878"

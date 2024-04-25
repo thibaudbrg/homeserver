@@ -1,0 +1,37 @@
+services:
+  # File Browser - Explorer
+  filebrowser:
+    image: filebrowser/filebrowser:s6
+    container_name: filebrowser
+    # profiles: ["apps", "all"]
+    # ports:
+    #   - "8123:8123"
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - t2_proxy
+      - filebrowser
+    volumes:
+      - $HOMEDIR:/srv/homes
+      - $DOCKERDIR:/srv/docker
+      - $DATADIR:/srv/data
+      - $NEXTCLOUDDIR:/srv/nextcloud
+      - $DOCKERDIR/appdata/filebrowser/config/filebrowser.db:/database/filebrowser.db:rw
+      - $DOCKERDIR/appdata/filebrowser/config/settings.json:/config/settings.json
+    environment:
+        TZ: $TZ
+        PUID: $PUID
+        PGID: $PGID
+    healthcheck:
+      test: curl -f http://localhost:8123/ || exit 1
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.filebrowser-rtr.entrypoints=https"
+      - "traefik.http.routers.filebrowser-rtr.rule=Host(`files.$DOMAINNAME0`)"
+      ## Middlewares
+      - "traefik.http.routers.filebrowser-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.filebrowser-rtr.service=filebrowser-svc"
+      - "traefik.http.services.filebrowser-svc.loadbalancer.server.port=8123"

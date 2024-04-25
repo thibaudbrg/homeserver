@@ -1,0 +1,32 @@
+services:
+  # phpMyAdmin - Database management
+  # Create a new user with admin privileges. Cannot login as MySQL root for some reason.
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
+    restart: always
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    # ports:
+    #   - "$PHPMYADMIN_PORT:80"
+    # volumes:
+    #   - $DOCKERDIR/appdata/phpmyadmin:/etc/phpmyadmin
+    environment:
+      - PMA_HOST=mariadb
+      #- PMA_PORT=$DB_PORT
+      #- PMA_ARBITRARY=1
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql_root_password
+    secrets:
+      - mysql_root_password
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.phpmyadmin-rtr.entrypoints=https"
+      - "traefik.http.routers.phpmyadmin-rtr.rule=Host(`phpmyadmin.$DOMAINNAME0`)"
+      ## Middlewares
+      - "traefik.http.routers.phpmyadmin-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.phpmyadmin-rtr.service=phpmyadmin-svc"
+      - "traefik.http.services.phpmyadmin-svc.loadbalancer.server.port=80"

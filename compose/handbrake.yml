@@ -1,0 +1,37 @@
+services:
+  # Handbrake - Video Conversion (Transcoding and compression)
+  handbrake:
+    image: jlesage/handbrake:latest
+    container_name: handbrake
+    restart: "no"
+    # ports:
+    #   - "$HANDBRAKE_PORT:5800"
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - t2_proxy
+    volumes:
+      - $DATADIR:/data
+      - $DOCKERDIR/appdata/handbrake/config:/config
+      - $DOCKERDIR/appdata/handbrake/watch:/watch
+    environment:
+      USER_ID: $PUID
+      GROUP_ID: $PGID
+      UMASK: 002
+      TZ: $TZ
+      KEEP_APP_RUNNING: 1
+      CLEAN_TMP_DIR: 1
+      DISPLAY_WIDTH: 1600
+      DISPLAY_HEIGHT: 960
+      AUTOMATED_CONVERSION_KEEP_SOURCE: 1
+      VNC_PASSWORD: $HANDBRAKE_VNC_PASSWD
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.handbrake-rtr.entrypoints=https"
+      - "traefik.http.routers.handbrake-rtr.rule=Host(`handbrake.$DOMAINNAME0`)"
+      ## Middlewares
+      - "traefik.http.routers.handbrake-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.handbrake-rtr.service=handbrake-svc"
+      - "traefik.http.services.handbrake-svc.loadbalancer.server.port=5800"

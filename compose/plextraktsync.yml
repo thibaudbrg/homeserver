@@ -1,0 +1,12 @@
+services:
+  #PlexTraktSync - Add Plex medias to Trakt collection
+  plextraktsync:
+    image: ghcr.io/taxel/plextraktsync
+    container_name: plextraktsync
+    restart: on-failure:2
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/plextraktsync/config:/app/config

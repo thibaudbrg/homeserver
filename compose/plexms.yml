@@ -1,0 +1,48 @@
+services:
+  # Plex - Media Server
+  plexms:
+    image: plexinc/pms-docker:public
+    container_name: plexms
+    restart: "no"
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "$PLEX_PORT:32400/tcp"
+      - "3005:3005/tcp"
+      - "8324:8324/tcp"
+      - "32469:32469/tcp"
+      # - "1900:1900/udp" # conflicts with xTeVe and Synology default ports
+      - "32410:32410/udp"
+      - "32412:32412/udp"
+      - "32413:32413/udp"
+      - "32414:32414/udp"
+      - "$PLEX_WEB_TOOLS_PORT:33400"
+    devices:
+      - /dev/dri:/dev/dri # for hardware transcoding
+    volumes:
+      - $DOCKERDIR/appdata/plexms:/config
+      - $DATADIR/torrents:/torrents
+      - $DATADIR/usenet:/usenet
+      - $DATADIR/media:/media
+      - /dev/shm:/transcode
+    environment:
+      TZ: $TZ
+      HOSTNAME: "sPlex"
+      PLEX_CLAIM_FILE: /run/secrets/plex_claim
+      PLEX_UID: $PUID
+      PLEX_GID: $PGID
+      ADVERTISE_IP: http://$DOMAINNAME0:32400/
+    secrets:
+      - plex_claim
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.plexms-rtr.entrypoints=https"
+      - "traefik.http.routers.plexms-rtr.rule=Host(`plex.$DOMAINNAME0`)"
+      ## Middlewares
+      - "traefik.http.routers.plexms-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.plexms-rtr.service=plexms-svc"
+      - "traefik.http.services.plexms-svc.loadbalancer.server.port=32400"

@@ -1,0 +1,37 @@
+services:
+  # Notifiarr
+  notifiarr:
+    image: golift/notifiarr
+    container_name: notifiarr
+    restart: "no"
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      t2_proxy:
+        ipv4_address: 192.168.90.168
+    ports:
+      - "$NOTIFIARR_PORT:5454"
+    volumes:
+      - $DOCKERDIR/appdata/notifiarr:/config
+      - /var/run/utmp:/var/run/utmp
+    environment:
+      TZ: $TZ
+      PUID: $PUID
+      PGID: $PGID
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth Bypass
+      - "traefik.http.routers.notifiarr-rtr-bypass.entrypoints=https"
+      - "traefik.http.routers.notifiarr-rtr-bypass.rule=Host(`notifiarr.$DOMAINNAME0`)   && (Headers(`X-Api-Key`, `$NOTIFIARR_API_KEY`) || Query(`apikey`, `$NOTIFIARR_API_KEY`))"
+      - "traefik.http.routers.notifiarr-rtr-bypass.priority=100"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.notifiarr-rtr.entrypoints=https"
+      - "traefik.http.routers.notifiarr-rtr.rule=Host(`notifiarr.$DOMAINNAME0`)"
+      - "traefik.http.routers.notifiarr-rtr.priority=99"
+      ## Middlewares
+      - "traefik.http.routers.notifiarr-rtr-bypass.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.notifiarr-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.notifiarr-rtr.service=notifiarr-svc"
+      - "traefik.http.routers.notifiarr-rtr-bypass.service=notifiarr-svc"
+      - "traefik.http.services.notifiarr-svc.loadbalancer.server.port=5454"

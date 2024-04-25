@@ -1,0 +1,39 @@
+services:
+  # Tdarr Server - Library Optimizer
+  tdarr:
+    image: haveagitgat/tdarr:latest
+    container_name: tdarr
+    restart: "no"
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    #ports:
+    #  - "$TDARR_SERVER_PORT:8266"
+    #  - "$TDARR_WEB_PORT:8265"
+    #  - 8267:8267 # node port. It should be mapped on this container because  the node container use the network from the main container
+    volumes:
+      - $DOCKERDIR/appdata/tdarr/server:/app/server
+      - $DOCKERDIR/appdata/tdarr/configs:/app/configs
+      - $DOCKERDIR/appdata/tdarr/logs:/app/logs
+      - $DOCKERDIR/appdata/tdarr/transcode:/data/temp
+      - $DATADIR/media:/data/media:ro
+      - $DATADIR/media/transcoded:/data/output
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      serverIP: tdarr # or hostname
+      serverPort: 8266
+      webUIPort: 8265
+      UMASK_SET: 002
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.tdarr-rtr.entrypoints=https"
+      - "traefik.http.routers.tdarr-rtr.rule=Host(`tdarr.$DOMAINNAME0`)"
+      ## Middlewares
+      - "traefik.http.routers.tdarr-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.tdarr-rtr.service=tdarr-svc"
+      - "traefik.http.services.tdarr-svc.loadbalancer.server.port=8265"

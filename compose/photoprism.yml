@@ -1,0 +1,43 @@
+services:
+  photoprism:
+    container_name: photoprism
+    image: photoprism/photoprism:latest
+    restart: unless-stopped
+    stop_grace_period: 10s
+    networks:
+      - t2_proxy
+      - photoprism
+    depends_on:
+      - mariadb
+    security_opt:
+      - no-new-privileges:true
+      - seccomp:unconfined
+      - apparmor:unconfined
+      # ports:
+      # - "2342:2342"
+    environment:
+      TZ: $TZ
+      PUID: $PUID
+      PGID: $PGID
+      # Most of the config is in appdata/photoprism/storage/config/options.yml
+      PHOTOPRISM_AUTH_MODE: "password"               # authentication mode (public, password)
+      PHOTOPRISM_HTTP_COMPRESSION: "gzip"            # improves transfer speed and bandwidth utilization (none or gzip)
+      PHOTOPRISM_SITE_CAPTION: "AI-Powered Photos App"
+      PHOTOPRISM_LOG_LEVEL: "info"                   # log level: trace, debug, info, warning, error, fatal, or panic
+      PHOTOPRISM_DATABASE_SERVER: "mariadb:$MARIADB_PORT"
+    working_dir: "/photoprism" # do not change or remove
+    volumes:
+      - $PHOTOPRISMDIR:/photoprism/originals               # Original media files (DO NOT REMOVE)
+      # - "/example/family:/photoprism/originals/family" # *Additional* media folders can be mounted like this
+      # - "~/Import:/photoprism/import"                  # *Optional* base folder from which files can be imported to originals
+      - $DOCKERDIR/appdata/photoprism/storage:/photoprism/storage                 # *Writable* storage folder for cache, database, and sidecar files (DO NOT REMOVE)
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.photoprism-rtr.entrypoints=https"
+      - "traefik.http.routers.photoprism-rtr.rule=Host(`photoprism.$DOMAINNAME0`)"
+      ## Middlewares
+      - "traefik.http.routers.photoprism-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.photoprism-rtr.service=photoprism-svc"
+      - "traefik.http.services.photoprism-svc.loadbalancer.server.port=2342"

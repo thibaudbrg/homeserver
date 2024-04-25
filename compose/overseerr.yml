@@ -1,0 +1,29 @@
+services:
+  #Overseerr - Request management and Media discovery
+  overseerr:
+    image: sctx/overseerr
+    container_name: overseerr
+    security_opt:
+      - no-new-privileges:true
+    restart: "no"
+    networks:
+      - t2_proxy
+    environment:
+      TZ: $TZ
+      PUID: $PUID
+      PGID: $PGID
+      LOG_LEVEL: info
+    volumes:
+      - $DOCKERDIR/appdata/overseerr/config:/app/config
+    #ports:
+    #  - $OVERSEERR_PORT:5055
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.overseerr-rtr.entrypoints=https"
+      - "traefik.http.routers.overseerr-rtr.rule=Host(`overseerr.$DOMAINNAME0`)"
+      ## Middlewares
+      - "traefik.http.routers.overseerr-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.overseerr-rtr.service=overseerr-svc"
+      - "traefik.http.services.overseerr-svc.loadbalancer.server.port=5055"

@@ -1,0 +1,28 @@
+services:
+  #Tautulli - Track usage on Plex Server
+  tautulli:
+    image: tautulli/tautulli
+    container_name: tautulli
+    restart: "no"
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      TZ: $TZ
+      PUID: $PUID
+      PGID: $PGID
+    volumes:
+      - $DOCKERDIR/appdata/tautulli/config:/config
+    #ports:
+    #  - #TAUTULLI_PORT:8181
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.tautulli-rtr.entrypoints=https"
+      - "traefik.http.routers.tautulli-rtr.rule=Host(`tautulli.$DOMAINNAME0`)"
+      ## Middlewares
+      - "traefik.http.routers.tautulli-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.tautulli-rtr.service=tautulli-svc"
+      - "traefik.http.services.tautulli-svc.loadbalancer.server.port=8181"

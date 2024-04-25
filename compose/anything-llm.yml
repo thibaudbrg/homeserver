@@ -1,0 +1,28 @@
+services:
+  anything-llm:
+    image: mintplexlabs/anythingllm:latest
+    container_name: anything-llm
+    restart: unless-stopped
+    #ports:
+    #  - 3001:3001 
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - t2_proxy
+      - llm
+    volumes:
+      - $DOCKERDIR/appdata/anythingllm/.env:/app/server/.env
+      - $DOCKERDIR/appdata/anythingllm/server/storage:/app/server/storage
+      - $DOCKERDIR/appdata/anythingllm/collector/hotdir:/app/collector/hotdir
+      - $DOCKERDIR/appdata/anythingllm/collector/outputs:/app/collector/outputs
+    environment:
+      STORAGE_DIR: /app/server/storage
+    # cap_add:
+    #   - SYS_ADMIN # Grants the SYS_ADMIN capability to the container, which may be necessary for certain operations within AnythingLLM.
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.anything-llm.entrypoints=https"
+      - "traefik.http.routers.anything-llm.rule=Host(`llm.$DOMAINNAME0`)"
+      - "traefik.http.routers.anything-llm.middlewares=chain-authelia@file"
+      - "traefik.http.routers.anything-llm.service=anything-llm-svc"
+      - "traefik.http.services.anything-llm-svc.loadbalancer.server.port=3001"

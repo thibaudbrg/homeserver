@@ -1,0 +1,44 @@
+services:
+  # Nextcloud Docker Application
+  nextcloud:
+    image: linuxserver/nextcloud:latest
+    container_name: nextcloud
+    hostname: nextcloud
+    restart: unless-stopped
+    #security_opt:
+    #  - no-new-privileges:true
+    networks:
+      - t2_proxy
+      - nextcloud
+    #ports:
+    #  - $NEXTCLOUD_PORT_LINUX:443
+    # Persistent volumes with bind mounts to easily move/backup data
+    volumes:
+      - /$DOCKERDIR/appdata/nextcloud:/config
+      - /$NEXTCLOUDDIR:/data
+    secrets:
+      - db_root_password
+      - db_password
+    environment:
+      TZ: $TZ
+      PUID: $PUID
+      PGID: $PGID
+      REDIS_HOST: $IP_NAS
+      REDIS_HOST_PASSWORD: $REDIS_PASSWORD
+      NEXTCLOUD_TRUSTED_DOMAIN: nextcloud.$DOMAINNAME0
+      TRUSTED_PROXIES: 192.168.90.0/24
+      MYSQL_USER: nextcloud
+      MYSQL_DATABASE: nextcloud
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      MYSQL_PASSWORD_FILE: /run/secrets/db_password
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.nextcloud-rtr.entrypoints=https"
+      - "traefik.http.routers.nextcloud-rtr.rule=Host(`nextcloud.$DOMAINNAME0`)"
+      ## Middlewares
+      - "traefik.http.routers.nextcloud-rtr.middlewares=chain-nextcloud@file"
+      ## HTTP Services
+      - "traefik.http.routers.nextcloud-rtr.service=nextcloud-svc"
+      - "traefik.http.services.nextcloud-svc.loadbalancer.server.port=443"
+      - "traefik.http.services.nextcloud-svc.loadbalancer.server.scheme=https" # specific to NextCloud because container uses https by default

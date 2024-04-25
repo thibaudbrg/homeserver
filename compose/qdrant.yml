@@ -1,0 +1,25 @@
+services:
+  qdrant:
+    container_name: qdrant
+    image: qdrant/qdrant:latest
+    restart: always
+    ports:
+      - 6333:6333
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      t2_proxy:
+      llm:
+        ipv4_address: 192.168.95.163
+    volumes:
+      - $DOCKERDIR/appdata/qdrant/data:/qdrant_data
+    labels:
+      - "traefik.enable=true"
+      # HTTP Routers for the main Qdrant API
+      - "traefik.http.routers.qdrant-api-rtr.entrypoints=https"
+      - "traefik.http.routers.qdrant-api-rtr.rule=Host(`qdrant.$DOMAINNAME0`)"
+      # Middlewares
+      - "traefik.http.routers.qdrant-api-rtr.middlewares=chain-authelia@file"
+      # HTTP Services
+      - "traefik.http.routers.qdrant-api-rtr.service=qdrant-api-svc"
+      - "traefik.http.services.qdrant-api-svc.loadbalancer.server.port=6333"

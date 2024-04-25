@@ -1,0 +1,26 @@
+services:
+  chromadb:
+    container_name: chromadb
+    image: ghcr.io/chroma-core/chroma:latest
+    volumes:
+      # Default configuration for persist_directory in chromadb/config.py
+      - $DOCKERDIR/appdata/chromadb/data:/chroma/chroma/
+    ports:
+      - 8000:8000
+    networks:
+      llm:
+        ipv4_address: 192.168.95.162
+    environment:
+      <<: *default-tz-puid-pgid
+      IS_PERSISTENT: "true"
+      ALLOW_RESET: "true"
+      CHROMA_SERVER_AUTH_CREDENTIALS: 9aB3xP78QvT4zG6hJkL0MnOp
+      CHROMA_SERVER_AUTH_CREDENTIALS_PROVIDER: chromadb.auth.token.TokenConfigServerAuthCredentialsProvider
+      CHROMA_SERVER_AUTH_PROVIDER: chromadb.auth.token.TokenAuthServerProvider
+      CHROMA_SERVER_AUTH_TOKEN_TRANSPORT_HEADER: X_CHROMA_TOKEN
+      PERSIST_DIRECTORY: ${PERSIST_DIRECTORY:-/chroma/chroma}
+      - CHROMA_OTEL_EXPORTER_ENDPOINT=${CHROMA_OTEL_EXPORTER_ENDPOINT}
+      - CHROMA_OTEL_EXPORTER_HEADERS=${CHROMA_OTEL_EXPORTER_HEADERS}
+      - CHROMA_OTEL_SERVICE_NAME=${CHROMA_OTEL_SERVICE_NAME}
+      - CHROMA_OTEL_GRANULARITY=${CHROMA_OTEL_GRANULARITY}
+      - CHROMA_SERVER_NOFILE=${CHROMA_SERVER_NOFILE}
