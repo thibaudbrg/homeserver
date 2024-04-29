@@ -141,9 +141,9 @@ include:
   - compose/qdirstat.yml
 
   # REMOTE ACCESS & SECURITY
-  - compose/guacamole.yml
-  - compose/guacd.yml
-  - compose/code-server.yml
+  # - compose/guacamole.yml
+  # - compose/guacd.yml
+  # - compose/code-server.yml
   - compose/wg-easy.yml
 
   # DATA & FILE MANAGEMENT

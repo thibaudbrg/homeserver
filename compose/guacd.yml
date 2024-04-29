@@ -4,6 +4,6 @@ services:
     image: guacamole/guacd
     container_name: guacd
     user: "$PUID:$PGID" # Specify user and group ID
-    restart: unless-stopped
+    restart: always
     security_opt:
       - no-new-privileges:true

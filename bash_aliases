@@ -1,3 +1,19 @@
+# Base system binaries
+export PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/syno/sbin:/usr/syno/bin:/usr/local/sbin:/usr/local/bin"
+
+# Additional tools and libraries from opt
+export PATH="$PATH:/opt/bin:/opt/sbin"
+
+# Rust binaries (for tools like eza)
+export PATH="$HOME/.cargo/bin:$PATH"
+
+# fzf for fuzzy finding capabilities
+export PATH="$HOME/.fzf/bin:$PATH"
+
+# Local bin for pip and other user-specific applications
+export PATH="$PATH:$HOME/.local/bin"
+
+
 # This is my current / up-to-date list of bash aliases.
 
 # DOCKER - All Docker commands start with "d" AND Docker Compose commands start with "dc"
@@ -24,7 +40,7 @@ alias dp777='sudo chown -R $USER:$USER $HOME/docker/secrets ; sudo chmod -R 777 
 alias dcrun='sudo COMPOSE_HTTP_TIMEOUT=200 docker-compose -f /volume1/docker/docker-compose.yml' # /volume1/docker symlinked to /var/services/homes/user/docker;;
 
 alias dclogs='dcrun logs -tf --tail="50" ' # usage: dclogs container_name
-alias dcup='dcrun up -d --build --remove-orphans' # up the stack
+alias dcup='dcrun up -d --build' # up the stack
 alias dcdown='dcrun down --remove-orphans' # down the stack
 alias dcrec='dcrun up -d --force-recreate --remove-orphans' # usage: dcrec container_name
 alias dcstop='dcrun stop' # usage: dcstop container_name
@@ -95,22 +111,13 @@ alias nano='sudo nano -iSw$'
 
 
 # Use fzf to enhance the 'cd' command with fuzzy finding capabilities
-fcd() {
-  local dir
-  dir=$(find ${1:-.} -type d -not -path '*/\.*' 2> /dev/null | fzf +m) && cd "$dir"
-}
+# fcd() {
+#   local dir
+#   dir=$(find ${1:-.} -type d -not -path '*/\.*' 2> /dev/null | fzf +m) && cd "$dir"
+# }
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# [#  -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 
 alias cat='bat'
 alias top='htop'
-
-# For trash-cli and other apps (usually from pip)
-export PATH="$PATH:$HOME/.local/bin"
-
-# fzf Fuzzer
-export PATH="$HOME/.fzf/bin:$PATH"
-
-# Rust (for eza)
-export PATH="$HOME/.cargo/bin:$PATH"
