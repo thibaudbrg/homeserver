@@ -13,7 +13,6 @@ export PATH="$HOME/.fzf/bin:$PATH"
 # Local bin for pip and other user-specific applications
 export PATH="$PATH:$HOME/.local/bin"
 
-
 # This is my current / up-to-date list of bash aliases.
 
 # DOCKER - All Docker commands start with "d" AND Docker Compose commands start with "dc"
