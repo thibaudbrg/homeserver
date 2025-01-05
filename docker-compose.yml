@@ -68,7 +68,12 @@ networks:
     ipam:
       config:
         - subnet: 192.168.97.0/24
-
+  telegram_bots:
+    name: filebrowser
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.98.0/24
 
 
 ########################### SECRETS
@@ -87,8 +92,8 @@ secrets:
     file: $DOCKERDIR/secrets/cf_token
   oauth_secret:
     file: $DOCKERDIR/secrets/oauth_secret
-  authelia_jwt_secret:
-    file: $DOCKERDIR/secrets/authelia_jwt_secret
+  authelia_identity_validation_reset_password_jwt_secret_file:
+    file: $DOCKERDIR/secrets/authelia_identity_validation_reset_password_jwt_secret_file
   authelia_session_secret:
     file: $DOCKERDIR/secrets/authelia_session_secret
   authelia_storage_mysql_password:
@@ -130,10 +135,10 @@ secrets:
 
 include:
   # CORE SERVICES
-  - compose/traefik.yml
-  - compose/socket-proxy.yml
-  - compose/authelia.yml
-  - compose/portainer.yml
+  # - compose/traefik.yml
+  # - compose/socket-proxy.yml
+  # - compose/authelia.yml
+  # - compose/portainer.yml
 
   # MONITORING & LOGGING
   - compose/dozzle.yml

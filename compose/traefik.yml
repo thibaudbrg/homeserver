@@ -22,7 +22,6 @@ services:
       - --api.dashboard=true
       #- --ping=true
       #- --pilot.token=$TRAEFIK_PILOT_TOKEN
-      # - --serversTransport.insecureSkipVerify=true
       - --log=true
       - --log.level=INFO # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
       - --accessLog=false

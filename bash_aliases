@@ -4,8 +4,11 @@ export PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/syno/sbin:/usr/syno/bin:/usr/loc
 # Additional tools and libraries from opt
 export PATH="$PATH:/opt/bin:/opt/sbin"
 
-# Rust binaries (for tools like eza)
-export PATH="$HOME/.cargo/bin:$PATH"
+# Cargo and Rust binaries (for tools like eza)
+export CARGO_HOME=/volume1/rust-install/.cargo
+export RUSTUP_HOME=/volume1/rust-install/.rustup
+export PATH="$CARGO_HOME/bin:$PATH"
+
 
 # fzf for fuzzy finding capabilities
 export PATH="$HOME/.fzf/bin:$PATH"

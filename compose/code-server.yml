@@ -27,7 +27,7 @@ services:
       - "traefik.http.routers.code-server-rtr.rule=Host(`code.$DOMAINNAME0`)"
       - "traefik.http.routers.code-server-rtr.tls=true"
       ## Middlewares
-      - "traefik.http.routers.code-server-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.code-server-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
       - "traefik.http.routers.code-server-rtr.service=code-server-svc"
       - "traefik.http.services.code-server-svc.loadbalancer.server.port=8443"
