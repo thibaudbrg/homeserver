@@ -1,6 +1,7 @@
 services:
   # Nextcloud Docker Application
   nextcloud:
+    # NOTE for occ use: for LinuxServer image, occ is directly accessible from the container shell e.g. docker exec -it nextcloud occ [command]
     image: linuxserver/nextcloud:latest
     container_name: nextcloud
     hostname: nextcloud
@@ -8,8 +9,9 @@ services:
     #security_opt:
     #  - no-new-privileges:true
     networks:
-      - t2_proxy
+      - traefik_network
       - nextcloud
+      - redis
     #ports:
     #  - $NEXTCLOUD_PORT_LINUX:443
     # Persistent volumes with bind mounts to easily move/backup data
@@ -23,10 +25,10 @@ services:
       TZ: $TZ
       PUID: $PUID
       PGID: $PGID
-      REDIS_HOST: $IP_NAS
+      REDIS_HOST: redis
       REDIS_HOST_PASSWORD: $REDIS_PASSWORD
       NEXTCLOUD_TRUSTED_DOMAIN: nextcloud.$DOMAINNAME0
-      TRUSTED_PROXIES: 192.168.90.0/24
+      TRUSTED_PROXIES: 192.168.90.0/24 # coming from traefik network traefik_network
       MYSQL_USER: nextcloud
       MYSQL_DATABASE: nextcloud
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
@@ -42,3 +44,4 @@ services:
       - "traefik.http.routers.nextcloud-rtr.service=nextcloud-svc"
       - "traefik.http.services.nextcloud-svc.loadbalancer.server.port=443"
       - "traefik.http.services.nextcloud-svc.loadbalancer.server.scheme=https" # specific to NextCloud because container uses https by default
+      - "traefik.http.services.nextcloud-svc.loadbalancer.serverstransport=ignorecert@file" # specific to NextCloud because container uses self-signed certs

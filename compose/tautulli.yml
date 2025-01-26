@@ -5,7 +5,7 @@ services:
     container_name: tautulli
     restart: "no"
     networks:
-      - t2_proxy
+      - traefik_network
     security_opt:
       - no-new-privileges:true
     environment:

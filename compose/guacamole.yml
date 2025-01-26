@@ -9,7 +9,7 @@ services:
     security_opt:
       - no-new-privileges:true
     networks:
-      - t2_proxy
+      - traefik_network
       - default
     # ports:
     #   - "$GUACAMOLE_PORT:8080"

@@ -7,7 +7,7 @@ services:
       - no-new-privileges:true
     restart: "no"
     networks:
-      - t2_proxy
+      - traefik_network
     environment:
       TZ: $TZ
       PUID: $PUID

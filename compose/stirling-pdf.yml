@@ -1,0 +1,30 @@
+services:
+  stirling-pdf:
+    image: stirlingtools/stirling-pdf:latest
+    container_name: stirling-pdf
+    security_opt:
+      - no-new-privileges:true
+    restart: "always"
+    networks:
+      - traefik_network
+    # ports:
+    #   - '8080:8080'
+    volumes:
+      - $DOCKERDIR/appdata/stirling-pdf/trainingData:/usr/share/tessdata # Required for extra OCR languages
+      - $DOCKERDIR/appdata/stirling-pdf/extraConfigs:/configs
+      - $DOCKERDIR/appdata/stirling-pdf/customFiles:/customFiles/
+      - $DOCKERDIR/appdata/stirling-pdf/logs:/logs/
+      - $DOCKERDIR/appdata/stirling-pdf/pipeline:/pipeline/
+    environment:
+      - DOCKER_ENABLE_SECURITY=true
+      - LANGS=en_US
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.stirling-pdf-rtr.entrypoints=https"
+      - "traefik.http.routers.stirling-pdf-rtr.rule=Host(`pdf.$DOMAINNAME0`)"
+      ## Middlewares
+      - "traefik.http.routers.stirling-pdf-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.stirling-pdf-rtr.service=stirling-pdf-svc"
+      - "traefik.http.services.stirling-pdf-svc.loadbalancer.server.port=8128"

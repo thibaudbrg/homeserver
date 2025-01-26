@@ -6,8 +6,8 @@ services:
     image: authelia/authelia:latest
     restart: always
     networks:
-      - t2_proxy
-      - default
+      - traefik_network
+      - redis
     security_opt:
       - no-new-privileges:true
     # ports:

@@ -5,7 +5,7 @@ services:
     image: tiredofit/traefik-cloudflare-companion:latest
     restart: unless-stopped
     networks:
-      - t2_proxy
+      - traefik_network
       - socket_proxy
     security_opt:
       - no-new-privileges:true

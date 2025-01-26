@@ -9,7 +9,7 @@ services:
     security_opt:
       - no-new-privileges:true
     networks:
-      t2_proxy:
+      traefik_network:
         ipv4_address: 192.168.90.169
     # ports:
     #  - "$TRANSMISSION_PORT:9091"

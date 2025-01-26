@@ -7,7 +7,7 @@ services:
     devices:
       - /dev/dri:/dev/dri # for hardware transcoding
     networks:
-      - t2_proxy
+      - traefik_network
     security_opt:
       - no-new-privileges:true
     environment:

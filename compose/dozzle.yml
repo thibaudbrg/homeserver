@@ -7,7 +7,7 @@ services:
     security_opt:
       - no-new-privileges:true
     networks:
-      - t2_proxy
+      - traefik_network
       - socket_proxy
     # ports:
     #   - "$DOZZLE_PORT:8080"

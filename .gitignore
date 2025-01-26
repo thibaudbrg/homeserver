@@ -51,3 +51,8 @@ __pycache__/
 # Backup & Log files
 *~
 *.swp
+
+\#recycle/
+*.vsix
+telegram_bots/*
+Wir

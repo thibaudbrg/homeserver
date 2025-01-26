@@ -8,7 +8,7 @@ services:
     security_opt:
       - no-new-privileges:true
     networks:
-      t2_proxy:
+      traefik_network:
       llm:
         ipv4_address: 192.168.95.163
     volumes:

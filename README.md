@@ -10,7 +10,7 @@ Welcome to my home server GitHub repository. This repository serves as a central
 ## Network Configuration
 
 This setup does not require external network configurations outside of what is defined in the Docker Compose files. Custom network subnets can be modified as needed. Networks used include: 
-- `t2_proxy`: Main proxy network 
+- `traefik_network`: Main proxy network 
 - `socket_proxy`: For Docker socket communications 
 - `nextcloud`: Dedicated network for Nextcloud
 - Additional application-specific networks as defined in the Docker Compose file.

@@ -6,7 +6,7 @@ services:
     security_opt:
       - no-new-privileges:true
     networks:
-      t2_proxy:
+      traefik_network:
       wg-easy:
         ipv4_address: 192.168.93.2
     restart: always
@@ -27,9 +27,8 @@ services:
     volumes:
       - $DOCKERDIR/appdata/wg-easy:/etc/wireguard
     ports:
-      - 127.0.0.1:51821:51821/tcp
-      - "6006:51820/udp"
-      # - "51821:51821/tcp"
+      - "6006:6006/udp"
+      # - "51821:51821/tcp" # GUI for wg-easy
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
@@ -45,4 +44,4 @@ services:
       - "traefik.http.routers.wg-easy-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
       - "traefik.http.routers.wg-easy-rtr.service=wg-easy-svc"
-      - "traefik.http.services.wg-easy-svc.loadbalancer.server.port=51821"
+      - "traefik.http.services.wg-easy-svc.loadbalancer.server.port=51821" # GUI

@@ -6,11 +6,11 @@ services:
     container_name: code-server
     restart: always
     networks:
-      - t2_proxy
+      - traefik_network
     security_opt:
       - no-new-privileges:true
-    #ports:
-    #  - "$CODE_SERVER_PORT:8443"
+    # ports:
+      # - "$CODE_SERVER_PORT:8443"
     volumes:
       - $DOCKERDIR/appdata/code-server:/config
       - $DOCKERDIR:/dockerdir

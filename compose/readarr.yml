@@ -6,7 +6,7 @@ services:
     container_name: readarr
     restart: unless-stopped
     networks:
-      t2_proxy:
+      traefik_network:
         ipv4_address: 192.168.90.165
     # ports:
     #  - "$READARR_PORT:8787"
@@ -26,7 +26,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers Auth Bypass
       - "traefik.http.routers.readarr-rtr-bypass.entrypoints=https"
-      - "traefik.http.routers.readarr-rtr-bypass.rule=Host(`readarr.$DOMAINNAME0`) && (Headers(`X-Api-Key`, `$READARR_API_KEY`) || Query(`apikey`, `$READARR_API_KEY`))"
+      - "traefik.http.routers.readarr-rtr-bypass.rule=Host(`readarr.$DOMAINNAME0`) && (Header(`X-Api-Key`, `$READARR_API_KEY`) || Query(`apikey`, `$READARR_API_KEY`))"
       - "traefik.http.routers.readarr-rtr-bypass.priority=100"
       ## HTTP Routers Auth
       - "traefik.http.routers.readarr-rtr.entrypoints=https"

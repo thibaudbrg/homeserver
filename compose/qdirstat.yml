@@ -7,11 +7,11 @@ services:
     # ports:
     #   - "$QDIRSTAT_PORT:5800"
     networks:
-      - t2_proxy
+      - traefik_network
     security_opt:
       - no-new-privileges:true
     volumes:
-      - /volume1:/storage:ro
+      - /volume2:/storage:ro
       - $DOCKERDIR/appdata/qdirstat/config:/config:rw
     environment:
       USER_ID: $PUID

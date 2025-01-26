@@ -8,16 +8,18 @@ services:
     security_opt:
       - no-new-privileges:true
     networks:
-      t2_proxy:
+      traefik_network:
         ipv4_address: 192.168.90.163
     ports:
       - "$LIDARR_PORT:8686"
     volumes:
-      - $DOCKERDIR/appdata/lidarr:/config
+      - $DOCKERDIR/appdata/lidarr/config/:/config
       # Optional. See why MediaCover is mounted as volume https://github.com/htpcBeginner/docker-traefik/discussions/147
       #- $DATADIR/temp/appdata/lidarr/MediaCover:/config/MediaCover
       - $DATADIR/:/data/
       - "/etc/localtime:/etc/localtime:ro"
+      - $DOCKERDIR/appdata/lidarr/arr-scripts/custom-services/:/custom-services.d # arr-scripts for tidal download
+      - $DOCKERDIR/appdata/lidarr/arr-scripts/custom-cont-init/:/custom-cont-init.d
     environment:
       TZ: $TZ
       PUID: $PUID
@@ -26,7 +28,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers Auth Bypass
       - "traefik.http.routers.lidarr-rtr-bypass.entrypoints=https"
-      - "traefik.http.routers.lidarr-rtr-bypass.rule=Host(`lidarr.$DOMAINNAME0`) && (Headers(`X-Api-Key`, `$LIDARR_API_KEY`) || Query(`apikey`, `$LIDARR_API_KEY`))"
+      - "traefik.http.routers.lidarr-rtr-bypass.rule=Host(`lidarr.$DOMAINNAME0`) && (Header(`X-Api-Key`, `$LIDARR_API_KEY`) || Query(`apikey`, `$LIDARR_API_KEY`))"
       - "traefik.http.routers.lidarr-rtr-bypass.priority=100"
       ## HTTP Routers Auth
       - "traefik.http.routers.lidarr-rtr.entrypoints=https"

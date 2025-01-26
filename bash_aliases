@@ -39,7 +39,7 @@ alias dp600='sudo chown -R root:root $HOME/docker/secrets ; sudo chmod -R 600 $H
 alias dp777='sudo chown -R $USER:$USER $HOME/docker/secrets ; sudo chmod -R 777 $HOME/docker/secrets ; sudo chown -R $USER:$USER $HOME/docker/.env ; sudo chmod -R 777 $HOME/docker/.env' # open permissions for editing
 
 # DOCKER COMPOSE TRAEFIK 2 - All docker-compose commands start with "dc" 
-alias dcrun='sudo COMPOSE_HTTP_TIMEOUT=200 docker-compose -f /volume1/docker/docker-compose.yml' # /volume1/docker symlinked to /var/services/homes/user/docker;;
+alias dcrun='sudo COMPOSE_HTTP_TIMEOUT=200 docker-compose -f /volume2/docker/docker-compose.yml' # /volume2/docker symlinked to /var/services/homes/user/docker;;
 
 alias dclogs='dcrun logs -tf --tail="50" ' # usage: dclogs container_name
 alias dcup='dcrun up -d --build' # up the stack
@@ -49,7 +49,7 @@ alias dcstop='dcrun stop' # usage: dcstop container_name
 alias dcrestart='dcrun restart ' # usage: dcrestart container_name
 alias dcstart='dcrun start ' # usage: dcstart container_name
 alias dcpull='dcrun pull' # usage: dcpull to pull all new images or dcpull container_name
-alias traefiklogs='tail -f /volume1/docker/appdata/traefik2/traefik.log' # tail traefik logs
+alias traefiklogs='tail -f /volume2/docker/appdata/traefik2/traefik.log' # tail traefik logs
 
 # NAVIGATION
 alias cd..='cd ..'
@@ -76,11 +76,17 @@ alias srmt='sudo trash-put'
 # FILE SIZE AND STORAGE
 alias fdisk='sudo fdisk -l'
 alias uuid='sudo vol_id -u'
+
+# ===== EZA ALIASES =====
 alias ls='eza'
-# alias ls='ls -F --color=auto --group-directories-first'
-# alias ll='ls -alh --color=auto --group-directories-first'
-# alias lt='ls --human-readable --color=auto --size -1 -S --classify' # file size sorted
-# alias lsr='ls --color=auto -t -1' # recently modified
+alias ll='eza -al'
+alias lt='eza --human-readable --color=auto --sort=size --reverse --classify -1'
+alias lsr='eza --color=auto --sort=modified --reverse -1'
+
+# ===== TREE FUNCTIONS =====
+llt() { [[ -z "$1" ]] && echo "Usage: llt <level>" && return 1; eza -al --tree --level="$1"; }
+lst() { [[ -z "$1" ]] && echo "Usage: lst <level>" && return 1; eza --tree --level="$1"; }
+
 alias mnt='mount | grep -E ^/dev | column -t' # show mounted drives
 alias dirsize='sudo du -hx --max-depth=1'
 alias dirusage='du -ch | grep total' # Grabs the disk usage in the current directory
@@ -123,3 +129,4 @@ alias nano='sudo nano -iSw$'
 
 alias cat='bat'
 alias top='htop'
+alias vim='nvim'

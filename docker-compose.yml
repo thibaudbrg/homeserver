@@ -10,7 +10,7 @@
 
 ########################### USEFUL COMMANDS
 # - To run the docker-compose file
-#       sudo COMPOSE_HTTP_TIMEOUT=200 docker-compose -f /volume1/docker/docker-compose-t2.yml up -d
+#       sudo COMPOSE_HTTP_TIMEOUT=200 docker-compose -f /volume2/docker/docker-compose-t2.yml up -d
 # - To see the logs of a process
 #       sudo docker logs -tf --tail="50" <process-name>
 # - Run plextraktsync for the first time in docker-compose-t2.yml
@@ -24,8 +24,8 @@
 # https://www.smarthomebeginner.com/traefik-docker-compose-guide-2022/
 
 networks:
-  t2_proxy:
-    name: t2_proxy
+  traefik_network:
+    name: traefik_network
     driver: bridge
     ipam:
       config:
@@ -69,11 +69,17 @@ networks:
       config:
         - subnet: 192.168.97.0/24
   telegram_bots:
-    name: filebrowser
+    name: telegram_bots
     driver: bridge
     ipam:
       config:
         - subnet: 192.168.98.0/24
+  redis:
+    name: redis
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.99.0/24
 
 
 ########################### SECRETS
@@ -135,10 +141,10 @@ secrets:
 
 include:
   # CORE SERVICES
-  # - compose/traefik.yml
-  # - compose/socket-proxy.yml
-  # - compose/authelia.yml
-  # - compose/portainer.yml
+  - compose/traefik.yml
+  - compose/socket-proxy.yml
+  - compose/authelia.yml
+  - compose/portainer.yml
 
   # MONITORING & LOGGING
   - compose/dozzle.yml
@@ -146,9 +152,9 @@ include:
   - compose/qdirstat.yml
 
   # REMOTE ACCESS & SECURITY
-  # - compose/guacamole.yml
-  # - compose/guacd.yml
-  # - compose/code-server.yml
+  - compose/guacamole.yml
+  - compose/guacd.yml
+  - compose/code-server.yml
   - compose/wg-easy.yml
 
   # DATA & FILE MANAGEMENT
@@ -203,3 +209,4 @@ include:
 
   # DASHBOARD
   - compose/homarr.yml
+  - compose/stirling-pdf.yml

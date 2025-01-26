@@ -5,7 +5,7 @@ services:
     container_name: bazarr
     restart: "no"
     networks:
-      - t2_proxy
+      - traefik_network
     security_opt:
       - no-new-privileges:true
     ports:
@@ -21,7 +21,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers Auth Bypass
       - "traefik.http.routers.bazarr-rtr-bypass.entrypoints=https"
-      - "traefik.http.routers.bazarr-rtr-bypass.rule=Host(`bazarr.$DOMAINNAME0`)   && (Headers(`X-Api-Key`, `$BAZARR_API_KEY`) || Query(`apikey`, `$BAZARR_API_KEY`))"
+      - "traefik.http.routers.bazarr-rtr-bypass.rule=Host(`bazarr.$DOMAINNAME0`)   && (Header(`X-Api-Key`, `$BAZARR_API_KEY`) || Query(`apikey`, `$BAZARR_API_KEY`))"
       - "traefik.http.routers.bazarr-rtr-bypass.priority=100"
       ## HTTP Routers Auth
       - "traefik.http.routers.bazarr-rtr.entrypoints=https"

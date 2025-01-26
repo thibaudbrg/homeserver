@@ -5,7 +5,7 @@ services:
     container_name: plextraktsync
     restart: on-failure:2
     networks:
-      - t2_proxy
+      - traefik_network
     security_opt:
       - no-new-privileges:true
     volumes:

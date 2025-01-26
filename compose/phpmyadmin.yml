@@ -6,7 +6,7 @@ services:
     container_name: phpmyadmin
     restart: always
     networks:
-      - t2_proxy
+      - traefik_network
     security_opt:
       - no-new-privileges:true
     # ports:
