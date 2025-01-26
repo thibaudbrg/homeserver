@@ -33,7 +33,7 @@ services:
       PLEX_CLAIM_FILE: /run/secrets/plex_claim
       PLEX_UID: $PUID
       PLEX_GID: $PGID
-      ADVERTISE_IP: http://$DOMAINNAME0:32400/
+      ADVERTISE_IP: https://plex.$DOMAINNAME0/
     secrets:
       - plex_claim
     labels:
