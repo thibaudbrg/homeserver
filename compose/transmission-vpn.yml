@@ -1,9 +1,8 @@
 services:
   # TransmissionBT - Torrent Downloader
-  # ONLY ACCESSIBLE THROUGH https://domain.com/transmission/web/ if using PathPrefix
-  # For Proxmox LXC Containers - https://pve.proxmox.com/wiki/OpenVPN_in_LXC
   transmission-vpn:
     image: haugene/transmission-openvpn:latest
+    #image: linuxserver/transmission:latest
     container_name: transmission-vpn
     restart: unless-stopped
     security_opt:
@@ -38,10 +37,11 @@ services:
       LOCAL_NETWORK: "$LOCAL_NETWORK"
       UMASK_SET: 2
       TRANSMISSION_WEB_UI: flood-for-transmission
-      TRANSMISSION_RPC_AUTHENTICATION_REQUIRED: "true"
+      TRANSMISSION_RPC_AUTHENTICATION_REQUIRED: "false"
       TRANSMISSION_RPC_HOST_WHITELIST: "127.0.0.1,$SERVER_IP"
-      TRANSMISSION_RPC_USERNAME: $TRANSMISSION_RPC_USERNAME
-      TRANSMISSION_RPC_PASSWORD: $TRANSMISSION_RPC_PASSWORD
+      #RPC_CREDS: /run/secrets/rpc_creds
+      #TRANSMISSION_RPC_USERNAME: $TRANSMISSION_RPC_USERNAME
+      #TRANSMISSION_RPC_PASSWORD: $TRANSMISSION_RPC_PASSWORD
       TRANSMISSION_UMASK: 002
       TRANSMISSION_RATIO_LIMIT: 0.01
       TRANSMISSION_RATIO_LIMIT_ENABLED: "true"
@@ -64,7 +64,7 @@ services:
       - "traefik.http.routers.transmission-vpn-rtr.entrypoints=https"
       - "traefik.http.routers.transmission-vpn-rtr.rule=Host(`transmission.$DOMAINNAME0`)"
       ## Middlewares
-      - "traefik.http.routers.transmission-vpn-rtr.middlewares=middlewares-rate-limit@file"
+      - "traefik.http.routers.transmission-vpn-rtr.middlewares=chain-no-auth@file"
       ## HTTP Services
       - "traefik.http.routers.transmission-vpn-rtr.service=transmission-vpn-svc"
       - "traefik.http.services.transmission-vpn-svc.loadbalancer.server.port=9091"

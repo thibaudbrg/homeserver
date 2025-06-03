@@ -3,6 +3,7 @@ services:
   notifiarr:
     image: golift/notifiarr
     container_name: notifiarr
+    hostname: notifiarr
     restart: "no"
     security_opt:
       - no-new-privileges:true
