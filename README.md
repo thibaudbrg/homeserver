@@ -4,7 +4,7 @@ Welcome to my home server GitHub repository. This repository serves as a central
 ## System Overview 
 - **Host** : Synology DS920+ 
 - **RAM** : 20 GB 
-- **Storage** : 1x18TB 
+- **Storage** : 3x18TB 
 - **OS** : DSM 7.X 
 - **Docker Compose Version** : 3.5 or higher
 ## Network Configuration
@@ -28,6 +28,7 @@ This setup does not require external network configurations outside of what is d
 - **Vaultwarden** : Secure password storage. 
 - **Nextcloud** : Personal cloud storage and office solution. 
 - **PhotoPrism** : Photo management and sharing. 
+- **Immich** : Self-hosted photo and video management with mobile app support and machine learning features. 
 - **MariaDB and phpMyAdmin** : Database management solutions. 
 - **Redis** : Advanced key-value store. 
 - **Redis Commander** : Redis database management. 
@@ -36,19 +37,27 @@ This setup does not require external network configurations outside of what is d
 ### Media Servers 
 - **Plex** : Media streaming platform including `plextraktsync` for syncing watched status and `Tautulli` for monitoring and statistics. 
 - **Overseerr** : Media request and management tool for Plex and Emby servers.
+### IPTV 
+- **Threadfin** : M3U proxy server for Plex, Emby, and Jellyfin with EPG support and stream filtering.
 ### Downloaders and Indexers 
 - **Transmission with VPN** : Secure torrent downloading. 
 - **NZBGet and SABnzbd** : Usenet downloading. 
 - **Sonarr, Radarr, Lidarr, Readarr, Bazarr, Prowlarr** : Media management for TV shows, movies, music, books, and subtitles. 
+- **Tidarr** : Tidal music downloader with Lidarr integration for high-quality streaming music downloads. 
+- **Ygege** : YGG torrent indexer integration for French content. 
 - **Flaresolverr** : Solves CAPTCHAs and manages Cloudflare challenges.
+### Media Utilities 
+- **Notifiarr** : Unified notification client for Sonarr, Radarr, Lidarr, and other *arr applications. 
+- **LRCGet** : Automatic synced lyrics fetching for music library with Redis caching support.
 ### Media Conversion Tools 
 - **Handbrake** : Video transcoding. 
 - **MKVToolNix and MakeMKV** : Video editing and remuxing. 
 - **Tdarr** : Automated media transcoding.
 ### Remote Access and Security 
-- **Guacamole** : Clientless remote desktop gateway. 
-- **WireGuard** : Simple and fast VPN that utilizes modern cryptography. 
-- **Code-Server** : VS Code running in the browser.
+- **Guacamole** : Clientless remote desktop gateway with support for VNC, RDP, and SSH. 
+- **Guacd** : Guacamole proxy daemon that handles all remote desktop protocol connections. 
+- **WireGuard (wg-easy)** : Simple and fast VPN with an easy-to-use web interface for managing connections. 
+- **Code-Server** : VS Code running in the browser for remote development.
 ### System Maintenance 
 - **Watchtower** : Automatic updating of Docker containers. 
 - **Docker-GC** : Garbage collection of unused Docker images and containers. 
@@ -56,8 +65,9 @@ This setup does not require external network configurations outside of what is d
 - **Cloudflare Companion** : Automatic CNAME creation for services.
 ### AI and Machine Learning 
 - **Anything LLM** : Custom AI services tailored for personal use.
-### Dashboards 
-- **Homarr** : Customizable homepage for all your services.
+### Dashboards and Utilities 
+- **Homarr** : Customizable homepage for all your services. 
+- **Stirling-PDF** : Self-hosted web-based PDF manipulation tool for merging, splitting, converting, and editing PDFs.
 
 ## Bash Aliases
 I use bash_aliases to simplify starting and stopping containers/stack. 
