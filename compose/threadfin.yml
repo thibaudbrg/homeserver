@@ -1,0 +1,31 @@
+services:
+  threadfin:
+    image: fyb3roptik/threadfin
+    container_name: threadfin
+    networks: 
+      - traefik_network
+    ports:
+      - 34400:34400
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKERDIR/appdata/threadfin/data/conf:/home/threadfin/conf
+      - $DOCKERDIR/appdata/threadfin/data/temp:/tmp/threadfin:rw
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.threadfin-rtr.entrypoints=https"
+      - "traefik.http.routers.threadfin-rtr.rule=Host(`threadfin.$DOMAINNAME0`)"
+      ## Middlewares
+      - "traefik.http.routers.threadfin-rtr.middlewares=chain-authelia@file"
+      ## Redirect
+        # redirect only the *root* https://threadfin.domain/ -> /web/
+      - "traefik.http.middlewares.threadfin-redirect.redirectregex.regex=^https?://threadfin\\.$DOMAINNAME0/?$"
+      - "traefik.http.middlewares.threadfin-redirect.redirectregex.replacement=https://threadfin.$DOMAINNAME0/web/"
+      - "traefik.http.middlewares.threadfin-redirect.redirectregex.permanent=true"
+      ## HTTP Services
+      - "traefik.http.routers.threadfin-rtr.service=threadfin-svc"
+      - "traefik.http.services.threadfin-svc.loadbalancer.server.port=34400"

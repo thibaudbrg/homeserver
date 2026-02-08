@@ -1,0 +1,48 @@
+services:
+  lrcget: # Fetches lyrics for music library
+    # image: diegoninja/lrcget-cli:latest
+    # Build from your fork instead of pulling diegoninja's image
+    build:
+      context: https://github.com/thibaudbrg/lrcget-cli.git#fix/utf8-truncate-watch
+    image: thibaudbrg/lrcget-cli:utf8-truncate-watch
+      # If you ever want to pin to a commit:
+      # context: https://github.com/thibaudbrg/lrcget-cli.git#<commit-sha>
+      # If Dockerfile is not at repo root, uncomment and adjust:
+      # dockerfile: Dockerfile
+
+    container_name: lrcget
+    user: "$PUID:$PGID"
+    restart: "no"
+    networks:
+      - redis
+    environment:
+      RUST_BACKTRACE: "1"
+      HOME: /data # Needed as user of the container is PUID and not root, container cannot writes at / of its system. Also user has no homes/ dir set by default
+      XDG_CONFIG_HOME: /data/.config
+      TZ: "${TZ}"
+      RUST_LOG: "debug"
+
+      # Behavior
+      LRCGET_LRCLIB_INSTANCE: "https://lrclib.net"
+      LRCGET_SKIP_TRACKS_WITH_SYNCED_LYRICS: "true"
+      LRCGET_SKIP_TRACKS_WITH_PLAIN_LYRICS: "false"
+      LRCGET_TRY_EMBED_LYRICS: "false"
+      LRCGET_SHOW_LINE_COUNT: "true"
+
+      # Redis for performance accelerations (using URL-encoded password of redis)
+      LRCGET_REDIS_URL: "redis://:${REDIS_PASSWORD_URLENC}@redis:6379/2"
+
+      # Watch tuning
+      LRCGET_WATCH_DEBOUNCE_SECONDS: "30" # how long it waits after changes before processing a batch
+      LRCGET_WATCH_BATCH_SIZE: "50" # max files per run
+
+    volumes:
+      - $DATADIR/media/music:/music
+      - $DOCKERDIR/appdata/lrcget/data:/data
+    command: ["watch", "/music", "--initial-scan"] # watch constently watches. If a new album is added it will trigger automatically lrcget
+    healthcheck:
+      test: ["CMD", "lrcget", "config", "show"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

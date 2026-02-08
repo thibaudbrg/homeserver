@@ -14,12 +14,9 @@ services:
       - "$LIDARR_PORT:8686"
     volumes:
       - $DOCKERDIR/appdata/lidarr/config/:/config
-      # Optional. See why MediaCover is mounted as volume https://github.com/htpcBeginner/docker-traefik/discussions/147
-      #- $DATADIR/temp/appdata/lidarr/MediaCover:/config/MediaCover
       - $DATADIR/:/data/
+      #- $DATADIR/:/data/tidarr/completed # Manually specified where does the completed downloads are located
       - "/etc/localtime:/etc/localtime:ro"
-      - $DOCKERDIR/appdata/lidarr/arr-scripts/custom-services/:/custom-services.d # arr-scripts for tidal download
-      - $DOCKERDIR/appdata/lidarr/arr-scripts/custom-cont-init/:/custom-cont-init.d
     environment:
       TZ: $TZ
       PUID: $PUID

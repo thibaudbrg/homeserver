@@ -43,8 +43,8 @@ alias dcrun='sudo COMPOSE_HTTP_TIMEOUT=200 docker-compose -f /volume2/docker/doc
 
 alias dclogs='dcrun logs -tf --tail="50" ' # usage: dclogs container_name
 alias dcup='dcrun up -d --build' # up the stack
-alias dcdown='dcrun down --remove-orphans' # down the stack
-alias dcrec='dcrun up -d --force-recreate --remove-orphans' # usage: dcrec container_name
+alias dcdown='dcrun down' # down the stack
+alias dcrec='dcrun up -d --force-recreate' # usage: dcrec container_name
 alias dcstop='dcrun stop' # usage: dcstop container_name
 alias dcrestart='dcrun restart ' # usage: dcrestart container_name
 alias dcstart='dcrun start ' # usage: dcstart container_name

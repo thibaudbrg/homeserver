@@ -24,6 +24,15 @@ services:
       - guac_db_name
       - guac_mysql_user
       - guac_mysql_password
+    volumes:
+      # Workaround for guacamole/guacamole:latest: MYSQL_*(_FILE) env vars are no longer translated into mysql-* properties,
+      # causing JDBC auth to fail with “Retrieval of database credentials failed”.
+      # This script reads Docker secrets (/run/secrets/...) and writes /etc/guacamole/guacamole.properties with mysql-* creds
+      # so the generated /tmp/guacamole-home.*/guacamole.properties always contains DB settings on every restart/recreate.
+      # Mounted as a single file (not the whole dir) to keep upstream entrypoint.d scripts; "050-" makes it run early.
+
+      # Mount ONLY the script into Guacamole's built-in entrypoint.d dir (do NOT replace the whole dir)
+      - $DOCKERDIR/appdata/guacamole/entrypoint.d/10-pin-mysql-props.sh:/opt/guacamole/entrypoint.d/050-pin-mysql-props.sh:ro
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

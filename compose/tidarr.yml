@@ -1,0 +1,31 @@
+services:
+    tidarr:
+        image: cstaelen/tidarr:lidarr
+        container_name: tidarr
+        ports:
+          - 8484:8484
+        volumes:
+          - $DOCKERDIR/appdata/tidarr/config:/shared
+          - $DATADIR/tidarr/completed:/data/tidarr/completed # Override previous mounting just for that subfolder
+          - $DATADIR/media/music:/music
+        restart: 'unless-stopped'
+        environment:
+          PUID: $PUID
+          PGID: $PGID
+          ENABLE_TIDAL_PROXY: true
+          ENABLE_HISTORY: true
+        networks:
+          traefik_network:
+            ipv4_address: 192.168.90.170
+        security_opt:
+          - no-new-privileges:true
+        labels:
+          - "traefik.enable=true"
+          ## HTTP Routers
+          - "traefik.http.routers.tidarr-rtr.entrypoints=https"
+          - "traefik.http.routers.tidarr-rtr.rule=Host(`tidarr.$DOMAINNAME0`)"
+          ## Middlewares
+          - "traefik.http.routers.tidarr-rtr.middlewares=chain-authelia@file"
+          ## HTTP Services
+          - "traefik.http.routers.tidarr-rtr.service=tidarr-svc"
+          - "traefik.http.services.tidarr-svc.loadbalancer.server.port=8484"

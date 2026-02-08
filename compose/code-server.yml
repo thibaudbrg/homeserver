@@ -18,8 +18,13 @@ services:
       TZ: $TZ
       PUID: $PUID
       PGID: $PGID
-      PASSWORD: $VSCODE_PASSWORD
+      #PASSWORD: $VSCODE_PASSWORD
+      FILE__HASHED_PASSWORD: /run/secrets/code_server_hashed_password
       # SUDO_PASSWORD: $VSCODE_SUDO_PASSWORD
+      EXTENSIONS_GALLERY: '{"serviceUrl":"https://marketplace.visualstudio.com/_apis/public/gallery","itemUrl":"https://marketplace.visualstudio.com/items"}'
+      DEFAULT_WORKSPACE:  /config/workspace
+    secrets:
+      - code_server_hashed_password
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

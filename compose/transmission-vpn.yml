@@ -15,7 +15,7 @@ services:
     cap_add:
       - NET_ADMIN
     devices:
-      - /dev/net/tun
+      - dev/net/tun:/dev/net/tun
     # dns:
     #   - 1.1.1.1
     #   - 1.0.0.1
@@ -33,7 +33,6 @@ services:
       OPENVPN_CONFIG: openvpn
       # OPENVPN_USERNAME: $PIA_USERNAME
       # OPENVPN_PASSWORD: $PIA_PASSWORD
-      #OPENVPN_OPTS: --inactive 3600 --ping 10 --ping-exit 60
       LOCAL_NETWORK: "$LOCAL_NETWORK"
       UMASK_SET: 2
       TRANSMISSION_WEB_UI: flood-for-transmission

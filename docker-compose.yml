@@ -138,23 +138,25 @@ secrets:
     file: $DOCKERDIR/secrets/postgres_password
   postgres_db:
     file: $DOCKERDIR/secrets/postgres_db
+  code_server_hashed_password:
+    file: $DOCKERDIR/secrets/code_server_hashed_password
 
 include:
   # CORE SERVICES
-  - compose/traefik.yml
+  #- compose/traefik.yml
   - compose/socket-proxy.yml
-  - compose/authelia.yml
+  #- compose/authelia.yml
   - compose/portainer.yml
 
   # MONITORING & LOGGING
-  - compose/dozzle.yml
+  #- compose/dozzle.yml
   - compose/glances.yml
   - compose/qdirstat.yml
 
   # REMOTE ACCESS & SECURITY
   - compose/guacamole.yml
   - compose/guacd.yml
-  - compose/code-server.yml
+  # - compose/code-server.yml
   - compose/wg-easy.yml
 
   # DATA & FILE MANAGEMENT
@@ -174,6 +176,9 @@ include:
   - compose/tautulli.yml
   - compose/overseerr.yml
 
+  # IPTV
+  - compose/threadfin.yml
+
   # MEDIA DOWNLOADERS
   - compose/transmission-vpn.yml
   - compose/nzbget.yml
@@ -185,13 +190,16 @@ include:
   - compose/readarr.yml
   - compose/lidarr.yml
   - compose/bazarr.yml
+  - compose/tidarr.yml
   - compose/prowlarr.yml
   - compose/flaresolverr.yml
+  - compose/ygege.yml
 
   # MEDIA UTILITIES
   - compose/notifiarr.yml
 
   # MEDIA CONVERSION TOOLS
+  # - compose/lrcget.yml
   - compose/tdarr.yml
   - compose/tdarr-node1.yml
   - compose/makemkv.yml

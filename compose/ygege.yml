@@ -1,0 +1,21 @@
+services:
+  ygege:
+    image: uwucode/ygege:latest
+    container_name: ygege
+    restart: unless-stopped
+    ports:
+      - "8715:8715"
+    volumes:
+      - $DOCKERDIR/appdata/ygege/config:/config
+    environment:
+      YGG_USERNAME: $YGG_USERNAME
+      YGG_PASSWORD: $YGG_PASSWORD
+      LOG_LEVEL: "debug"
+      # YGG_DOMAIN: "www.yggtorrent.org"  # Optionnel : forcer un domaine spécifique
+      TURBO_ENABLED: true  # Optionnel : Si turbo est actif, pas besoin d'attendre 30 secondes entre le token et le torrent
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8715/health || exit 1"]
+      interval: 1m30s
+      timeout: 20s
+      retries: 3
+      start_period: 10s
