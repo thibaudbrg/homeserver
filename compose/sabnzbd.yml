@@ -8,8 +8,7 @@ services:
     networks:
       traefik_network:
         ipv4_address: 192.168.90.219
-    ports:
-      - "$SABNZBD_PORT:9876"
+    # ports: no longer published (2026-10-11), reached through Traefik or by container name
     volumes:
       - $DOCKERDIR/appdata/sabnzbd:/config
       - $DATADIR/usenet/sabnzbd/complete:/data/usenet/sabnzbd/complete #optional

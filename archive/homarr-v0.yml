@@ -1,0 +1,35 @@
+# Archived 2026-10-11: Homarr v0 (ajnart), replaced by Homarr v2 in compose/homarr.yml.
+# Its data was moved to appdata/homarr/_v0-archive/ (contains old integration API keys, chmod 700).
+services:
+  # Homarr v0 (ajnart, archived 2025): kept read-only as reference until v2 is rebuilt, then archived
+  homarr-v0:
+    container_name: homarr-v0
+    image: ghcr.io/ajnart/homarr:latest
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - traefik_network
+      - socket_proxy
+    # ports:
+    #   - '7575:7575'
+    volumes:
+      - $DOCKERDIR/appdata/homarr/docker.sock:/var/run/docker.sock # Optional, only if you want docker integration
+      - $DOCKERDIR/appdata/homarr/configs:/app/data/configs
+      - $DOCKERDIR/appdata/homarr/icons:/app/public/icons
+      - $DOCKERDIR/appdata/homarr/data:/data
+    environment:
+      DOCKER_HOST: tcp://socket-proxy:2375
+      HOSTNAME: 0.0.0.0 # Next.js binds to $HOSTNAME, which Docker sets to the container id (resolves to one network only)
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false" # archived project, no more updates
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.homarr-v0-rtr.entrypoints=https"
+      - "traefik.http.routers.homarr-v0-rtr.rule=Host(`$DOMAINNAME0`) || Host(`www.$DOMAINNAME0`)"
+      - "traefik.http.routers.homarr-v0-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.homarr-v0-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.homarr-v0-rtr.service=homarr-v0-svc"
+      - "traefik.http.services.homarr-v0-svc.loadbalancer.server.port=7575"

@@ -17,9 +17,10 @@ services:
     ]
     networks:
       - redis
-    ports:
-      - "$REDIS_PORT:6379"
+    # ports: no longer published (2026-10-11), reached through Traefik or by container name
     volumes:
       - $DOCKERDIR/appdata/redis/data:/data
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false" # database: update by hand
       #- /etc/timezone:/etc/timezone:ro
       #- /etc/localtime:/etc/localtime:ro

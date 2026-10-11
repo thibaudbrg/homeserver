@@ -1,18 +1,37 @@
 services:
+  # ygege:
+  #   image: uwucode/ygege:latest
+  #   container_name: ygege
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8715:8715"
+  #   volumes:
+  #     - $DOCKERDIR/appdata/ygege/config:/config
+  #   environment:
+  #     YGG_USERNAME: $YGG_USERNAME
+  #     YGG_PASSWORD: $YGG_PASSWORD
+  #     LOG_LEVEL: "debug"
+  #     # YGG_DOMAIN: "www.yggtorrent.org"  # Optionnel : forcer un domaine spécifique
+  #     TURBO_ENABLED: true  # Optionnel : Si turbo est actif, pas besoin d'attendre 30 secondes entre le token et le torrent
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "curl --fail http://localhost:8715/health || exit 1"]
+  #     interval: 1m30s
+  #     timeout: 20s
+  #     retries: 3
+  #     start_period: 10s
+
+
   ygege:
-    image: uwucode/ygege:latest
+    image: ghcr.io/djerayane/ygege:docker-publish
     container_name: ygege
     restart: unless-stopped
-    ports:
-      - "8715:8715"
+    networks:
+      - traefik_network # Prowlarr reaches it as ygege:8715 (port no longer published)
     volumes:
       - $DOCKERDIR/appdata/ygege/config:/config
     environment:
-      YGG_USERNAME: $YGG_USERNAME
-      YGG_PASSWORD: $YGG_PASSWORD
+      RELAY_URL: "wss://relay.ygg.gratis"
       LOG_LEVEL: "debug"
-      # YGG_DOMAIN: "www.yggtorrent.org"  # Optionnel : forcer un domaine spécifique
-      TURBO_ENABLED: true  # Optionnel : Si turbo est actif, pas besoin d'attendre 30 secondes entre le token et le torrent
     healthcheck:
       test: ["CMD-SHELL", "curl --fail http://localhost:8715/health || exit 1"]
       interval: 1m30s

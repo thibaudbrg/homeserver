@@ -11,13 +11,15 @@ services:
       - socket_proxy
     environment:
       TZ: $TZ
+      WATCHTOWER_SCOPE: "none" # only containers without a scope label (scoped stacks run their own watchtower)
       WATCHTOWER_CLEANUP: "true"
-      WATCHTOWER_REMOVE_VOLUMES: "true"
       WATCHTOWER_INCLUDE_STOPPED: "true"
       WATCHTOWER_NO_STARTUP_MESSAGE: "false"
       WATCHTOWER_SCHEDULE: "0 30 12 * * *" # Everyday at 12:30
       WATCHTOWER_NOTIFICATIONS: shoutrrr
-      #WATCHTOWER_NOTIFICATION_URL: "telegram://$TGRAM_BOT_TOKEN@telegram?channels=$TGRAM_CHAT_ID"
+      WATCHTOWER_NOTIFICATION_URL: "telegram://$TGRAM_BOT_TOKEN@telegram?chats=$TGRAM_CHAT_ID" # same bot as Tautulli
       WATCHTOWER_NOTIFICATIONS_LEVEL: info
       DOCKER_HOST: tcp://socket-proxy:2375
       DOCKER_API_VERSION: "1.40"
+    labels:
+      - "com.centurylinklabs.watchtower.scope=none"  # only containers without a scope label (scoped stacks run their own watchtower)

@@ -3,7 +3,7 @@ services:
   plexms:
     image: plexinc/pms-docker:public
     container_name: plexms
-    restart: "no"
+    restart: unless-stopped
     networks:
       - traefik_network
     security_opt:

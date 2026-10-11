@@ -3,7 +3,7 @@ services:
   mkvtoolnix:
     image: jlesage/mkvtoolnix:latest
     container_name: mkvtoolnix
-    restart: "no"
+    restart: unless-stopped
     # ports:
     #   - "$MKVTOOLNIX_PORT:5800"
     security_opt:

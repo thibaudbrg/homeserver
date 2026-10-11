@@ -23,8 +23,8 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    ports:
-      - "$FLARESOLVERR_PORT:8191"
+    networks:
+      - traefik_network # Prowlarr reaches it as flaresolverr:8191 (port no longer published)
     environment:
       - LOG_LEVEL=info
       - LOG_HTML=false

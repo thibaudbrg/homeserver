@@ -3,13 +3,12 @@ services:
   bazarr:
     image: lscr.io/linuxserver/bazarr
     container_name: bazarr
-    restart: "no"
+    restart: unless-stopped
     networks:
       - traefik_network
     security_opt:
       - no-new-privileges:true
-    ports:
-      - "$BAZARR_PORT:6767"
+    # ports: no longer published (2026-10-11), reached through Traefik or by container name
     volumes:
       - $DOCKERDIR/appdata/bazarr:/config
       - $DATADIR/media:/data/media

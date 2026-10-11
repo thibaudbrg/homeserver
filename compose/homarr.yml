@@ -1,28 +1,32 @@
 services:
+  # Homarr v2 - Dashboard (homarr-labs, successor of the archived ajnart/homarr v0)
+  # Docs: https://homarr.dev/docs/getting-started/installation/docker
+  # The v0 board was imported via v1.77.2 (last release with the old importer), then migrated to v2.
+  # Serves the root domain, www and homarr. (v0 archived in archive/homarr-v0.yml)
+  # SECRET_ENCRYPTION_KEY encrypts integration secrets in the DB: never change it after first start.
   homarr:
     container_name: homarr
-    image: ghcr.io/ajnart/homarr:latest
-    restart: "no"
+    image: ghcr.io/homarr-labs/homarr:latest
+    restart: unless-stopped
     security_opt:
       - no-new-privileges:true
     networks:
       - traefik_network
       - socket_proxy
-    # ports:
-    #   - '7575:7575'
     volumes:
-      - $DOCKERDIR/appdata/homarr/docker.sock:/var/run/docker.sock # Optional, only if you want docker integration
-      - $DOCKERDIR/appdata/homarr/configs:/app/data/configs
-      - $DOCKERDIR/appdata/homarr/icons:/app/public/icons
-      - $DOCKERDIR/appdata/homarr/data:/data
+      - $DOCKERDIR/appdata/homarr/appdata:/appdata
     environment:
-      DOCKER_HOST: tcp://socket-proxy:2375
+      TZ: $TZ
+      PUID: $PUID
+      PGID: $PGID
+      SECRET_ENCRYPTION_KEY: $HOMARR_SECRET_ENCRYPTION_KEY
+      DOCKER_HOSTNAMES: socket-proxy # Docker integration through the socket proxy, no socket mount
+      DOCKER_PORTS: 2375
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.homarr-rtr.entrypoints=https"
-      - "traefik.http.routers.homarr-rtr.rule=Host(`$DOMAINNAME0`) || Host(`www.$DOMAINNAME0`)"
-      - "traefik.http.routers.homarr-rtr.tls=true"
+      - "traefik.http.routers.homarr-rtr.rule=Host(`$DOMAINNAME0`) || Host(`www.$DOMAINNAME0`) || Host(`homarr.$DOMAINNAME0`)"
       ## Middlewares
       - "traefik.http.routers.homarr-rtr.middlewares=chain-authelia@file"
       ## HTTP Services

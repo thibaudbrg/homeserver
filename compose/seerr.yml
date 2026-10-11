@@ -1,0 +1,37 @@
+services:
+  # Seerr - Media requests & discovery (successor of Overseerr + Jellyseerr, same team)
+  # Docs: https://docs.seerr.dev/migration-guide
+  # Migrated from Overseerr 2026-10-11: config copied (Overseerr data kept in appdata/overseerr for rollback),
+  # Seerr migrates it automatically on first start.
+  # The image runs as its `node` user (UID 1000): appdata/seerr/config must be owned by 1000:1000 (official requirement).
+  seerr:
+    container_name: seerr
+    image: ghcr.io/seerr-team/seerr:latest
+    init: true # required: the image no longer ships an init process
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - traefik_network
+    environment:
+      TZ: $TZ
+      LOG_LEVEL: info
+    volumes:
+      - $DOCKERDIR/appdata/seerr/config:/app/config
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/settings/public || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      # Same address as Overseerr so users' links, apps and Homarr keep working
+      - "traefik.http.routers.seerr-rtr.entrypoints=https"
+      - "traefik.http.routers.seerr-rtr.rule=Host(`overseerr.$DOMAINNAME0`)"
+      ## Middlewares
+      - "traefik.http.routers.seerr-rtr.middlewares=chain-no-auth@file" # unchanged from Overseerr: Seerr's own login (Plex + local users)
+      ## HTTP Services
+      - "traefik.http.routers.seerr-rtr.service=seerr-svc"
+      - "traefik.http.services.seerr-svc.loadbalancer.server.port=5055"

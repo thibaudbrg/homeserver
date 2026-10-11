@@ -1,13 +1,13 @@
 services:
     tidarr:
-        image: cstaelen/tidarr:lidarr
+        image: cstaelen/tidarr:latest # was :lidarr (Jan 2026 preview tag); Lidarr connector is in the main image since 1.x
         container_name: tidarr
-        ports:
-          - 8484:8484
+        # ports: no longer published (2026-10-11), reached through Traefik or by container name
         volumes:
           - $DOCKERDIR/appdata/tidarr/config:/shared
           - $DATADIR/tidarr/completed:/data/tidarr/completed # Override previous mounting just for that subfolder
           - $DATADIR/media/music:/music
+          - $DATADIR/tidarr/nzb_downloads:/shared/nzb_downloads # Lidarr connector: same folder is /downloads in lidarr
         restart: 'unless-stopped'
         environment:
           PUID: $PUID

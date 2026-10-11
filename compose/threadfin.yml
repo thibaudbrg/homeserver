@@ -4,8 +4,7 @@ services:
     container_name: threadfin
     networks: 
       - traefik_network
-    ports:
-      - 34400:34400
+    # ports: no longer published (2026-10-11), reached through Traefik or by container name
     environment:
       - PUID=$PUID
       - PGID=$PGID

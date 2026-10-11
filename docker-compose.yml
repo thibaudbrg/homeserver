@@ -80,20 +80,18 @@ networks:
     ipam:
       config:
         - subnet: 192.168.99.0/24
+  immich:
+    name: immich
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.100.0/24
 
 
 ########################### SECRETS
 secrets:
   htpasswd:
     file: $DOCKERDIR/secrets/htpasswd
-  cloudflare_email:
-    file: $DOCKERDIR/secrets/cloudflare_email
-  cloudflare_api_key:
-    file: $DOCKERDIR/secrets/cloudflare_api_key
-  cloudflare_api_token:
-    file: $DOCKERDIR/secrets/cloudflare_api_token
-  cf_email:
-    file: $DOCKERDIR/secrets/cf_email
   cf_token:
     file: $DOCKERDIR/secrets/cf_token
   oauth_secret:
@@ -114,10 +112,6 @@ secrets:
     file: $DOCKERDIR/secrets/authelia_session_redis_password
   mysql_root_password:
     file: $DOCKERDIR/secrets/mysql_root_password
-  db_password:
-    file: $DOCKERDIR/secrets/db_password
-  db_root_password:
-    file: $DOCKERDIR/secrets/db_root_password
   guac_db_name:
     file: $DOCKERDIR/secrets/guac_db_name
   guac_mysql_user:
@@ -132,14 +126,14 @@ secrets:
   #    file: $DOCKERDIR/secrets/my_email
   plex_claim:
     file: $DOCKERDIR/secrets/plex_claim
-  postgres_user:
-    file: $DOCKERDIR/secrets/postgres_user
-  postgres_password:
-    file: $DOCKERDIR/secrets/postgres_password
-  postgres_db:
-    file: $DOCKERDIR/secrets/postgres_db
   code_server_hashed_password:
     file: $DOCKERDIR/secrets/code_server_hashed_password
+  immich_db_username:
+    file: $DOCKERDIR/secrets/immich_db_username
+  immich_db_password:
+    file: $DOCKERDIR/secrets/immich_db_password
+  immich_db_name:
+    file: $DOCKERDIR/secrets/immich_db_name
 
 include:
   # CORE SERVICES
@@ -166,6 +160,7 @@ include:
   - compose/rediscommander.yml
   - compose/filebrowser.yml
   - compose/photoprism.yml
+  - compose/immich.yml
   - compose/qdrant.yml
   - compose/mariadb.yml
   - compose/phpmyadmin.yml
@@ -174,14 +169,14 @@ include:
   - compose/plexms.yml
   - compose/plextraktsync.yml
   - compose/tautulli.yml
-  - compose/overseerr.yml
+  - compose/seerr.yml # replaced Overseerr 2026-10-11 (see archive/overseerr.yml)
 
   # IPTV
   - compose/threadfin.yml
 
   # MEDIA DOWNLOADERS
   - compose/transmission-vpn.yml
-  - compose/nzbget.yml
+  # - compose/nzbget.yml # archived 2026-10-11, see archive/nzbget.yml
   - compose/sabnzbd.yml
 
   # MEDIA INDEXERS
@@ -209,7 +204,7 @@ include:
   # SYSTEM MAINTENANCE
   - compose/watchtower.yml
   - compose/ofelia.yml
-  - compose/dockergc.yml
+  # - compose/dockergc.yml # archived 2026-10-11, see archive/dockergc.yml (watchtower cleanup replaces it)
   - compose/cf-companion.yml
 
   # AI & MACHINE LEARNING
@@ -218,3 +213,6 @@ include:
   # DASHBOARD
   - compose/homarr.yml
   - compose/stirling-pdf.yml
+
+  # PRIVATE (not tracked in git, see .git/info/exclude)
+  - compose/private.yml

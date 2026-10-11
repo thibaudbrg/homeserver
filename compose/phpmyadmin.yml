@@ -17,9 +17,6 @@ services:
       - PMA_HOST=mariadb
       #- PMA_PORT=$DB_PORT
       #- PMA_ARBITRARY=1
-      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql_root_password
-    secrets:
-      - mysql_root_password
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

@@ -63,7 +63,7 @@ services:
       - "traefik.http.routers.transmission-vpn-rtr.entrypoints=https"
       - "traefik.http.routers.transmission-vpn-rtr.rule=Host(`transmission.$DOMAINNAME0`)"
       ## Middlewares
-      - "traefik.http.routers.transmission-vpn-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.transmission-vpn-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
       - "traefik.http.routers.transmission-vpn-rtr.service=transmission-vpn-svc"
       - "traefik.http.services.transmission-vpn-svc.loadbalancer.server.port=9091"

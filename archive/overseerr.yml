@@ -5,7 +5,7 @@ services:
     container_name: overseerr
     security_opt:
       - no-new-privileges:true
-    restart: "no"
+    restart: unless-stopped
     networks:
       - traefik_network
     environment:

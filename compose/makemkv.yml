@@ -3,7 +3,7 @@ services:
   makemkv:
     image: jlesage/makemkv:latest
     container_name: makemkv
-    restart: "no"
+    restart: unless-stopped
     # ports:
     #   - "$MAKEMKV_PORT:5800"
     security_opt:

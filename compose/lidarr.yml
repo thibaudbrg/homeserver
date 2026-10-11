@@ -4,17 +4,17 @@ services:
   lidarr:
     image: lscr.io/linuxserver/lidarr:latest
     container_name: lidarr
-    restart: "no"
+    restart: unless-stopped
     security_opt:
       - no-new-privileges:true
     networks:
       traefik_network:
         ipv4_address: 192.168.90.163
-    ports:
-      - "$LIDARR_PORT:8686"
+    # ports: no longer published (2026-10-11), reached through Traefik or by container name
     volumes:
       - $DOCKERDIR/appdata/lidarr/config/:/config
       - $DATADIR/:/data/
+      - $DATADIR/tidarr/nzb_downloads:/downloads # Tidarr connector: Tidarr writes /shared/nzb_downloads/{id}, Lidarr imports /downloads/{id}
       #- $DATADIR/:/data/tidarr/completed # Manually specified where does the completed downloads are located
       - "/etc/localtime:/etc/localtime:ro"
     environment:

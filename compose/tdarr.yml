@@ -3,7 +3,7 @@ services:
   tdarr:
     image: haveagitgat/tdarr:latest
     container_name: tdarr
-    restart: "no"
+    restart: unless-stopped
     networks:
       - traefik_network
     security_opt:

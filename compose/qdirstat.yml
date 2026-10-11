@@ -3,7 +3,7 @@ services:
   qdirstat:
     image: jlesage/qdirstat:latest
     container_name: qdirstat
-    restart: "no"
+    restart: unless-stopped
     # ports:
     #   - "$QDIRSTAT_PORT:5800"
     networks:

@@ -3,7 +3,7 @@ services:
   tautulli:
     image: tautulli/tautulli
     container_name: tautulli
-    restart: "no"
+    restart: unless-stopped
     networks:
       - traefik_network
     security_opt:

@@ -3,8 +3,7 @@ services:
     container_name: qdrant
     image: qdrant/qdrant:latest
     restart: always
-    ports:
-      - 6333:6333
+    # ports: 6333 no longer published, AnythingLLM reaches qdrant over the llm network (192.168.95.163)
     security_opt:
       - no-new-privileges:true
     networks:
@@ -12,7 +11,10 @@ services:
       llm:
         ipv4_address: 192.168.95.163
     volumes:
-      - $DOCKERDIR/appdata/qdrant/data:/qdrant_data
+      - $DOCKERDIR/appdata/qdrant/storage:/qdrant/storage
+      - $DOCKERDIR/appdata/qdrant/snapshots:/qdrant/snapshots
+    environment:
+      QDRANT__SERVICE__API_KEY: $QDRANT_API_KEY # same value as QDRANT_API_KEY in appdata/anythingllm/.env
     labels:
       - "traefik.enable=true"
       # HTTP Routers for the main Qdrant API

@@ -18,22 +18,14 @@ services:
     volumes:
       - /$DOCKERDIR/appdata/nextcloud:/config
       - /$NEXTCLOUDDIR:/data
-    secrets:
-      - db_root_password
-      - db_password
     environment:
       TZ: $TZ
       PUID: $PUID
       PGID: $PGID
-      REDIS_HOST: redis
-      REDIS_HOST_PASSWORD: $REDIS_PASSWORD
-      NEXTCLOUD_TRUSTED_DOMAIN: nextcloud.$DOMAINNAME0
-      TRUSTED_PROXIES: 192.168.90.0/24 # coming from traefik network traefik_network
-      MYSQL_USER: nextcloud
-      MYSQL_DATABASE: nextcloud
-      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
-      MYSQL_PASSWORD_FILE: /run/secrets/db_password
+      # DB, Redis, trusted domains and trusted proxies are set in appdata/nextcloud/www/nextcloud/config/config.php:
+      # the LinuxServer image ignores the official image's MYSQL_*, REDIS_* and TRUSTED_* variables
     labels:
+      - "com.centurylinklabs.watchtower.enable=false" # update by hand (app + DB migrations)
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.nextcloud-rtr.entrypoints=https"

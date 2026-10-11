@@ -5,8 +5,7 @@ services:
     container_name: mariadb
     hostname: mariadb
     image: linuxserver/mariadb:latest
-    ports:
-      - "$MARIADB_PORT:3306"
+    # ports: 3306 no longer published (2026-10-11): every client, Authelia included, connects as mariadb:3306 over Docker networks
     restart: always
     security_opt:
       - no-new-privileges:true
@@ -22,6 +21,8 @@ services:
       - PUID=$PUID
       - PGID=$PGID
       - TZ=$TZ
-      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql_root_password # Not taking this pw during initialization
+      - FILE__MYSQL_ROOT_PASSWORD=/run/secrets/mysql_root_password # LinuxServer reads FILE__ vars: enables the automatic upgrade check at startup
     secrets:
       - mysql_root_password
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false" # database: update by hand, run mariadb-upgrade after major versions

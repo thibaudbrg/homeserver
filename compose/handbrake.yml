@@ -3,7 +3,7 @@ services:
   handbrake:
     image: jlesage/handbrake:latest
     container_name: handbrake
-    restart: "no"
+    restart: unless-stopped
     # ports:
     #   - "$HANDBRAKE_PORT:5800"
     security_opt:

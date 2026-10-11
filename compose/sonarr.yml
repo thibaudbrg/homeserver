@@ -10,8 +10,7 @@ services:
     networks:
       traefik_network:
         ipv4_address: 192.168.90.167
-    ports:
-      - "$SONARR_PORT:8989"
+    # ports: no longer published (2026-10-11), reached through Traefik or by container name
     volumes:
       - $DOCKERDIR/appdata/sonarr:/config
       # Optional. See why MediaCover is mounted as volume https://github.com/htpcBeginner/docker-traefik/discussions/147

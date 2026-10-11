@@ -4,14 +4,13 @@ services:
     image: golift/notifiarr
     container_name: notifiarr
     hostname: notifiarr
-    restart: "no"
+    restart: unless-stopped
     security_opt:
       - no-new-privileges:true
     networks:
       traefik_network:
         ipv4_address: 192.168.90.168
-    ports:
-      - "$NOTIFIARR_PORT:5454"
+    # ports: no longer published (2026-10-11), reached through Traefik or by container name
     volumes:
       - $DOCKERDIR/appdata/notifiarr:/config
       - /var/run/utmp:/var/run/utmp

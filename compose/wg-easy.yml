@@ -1,7 +1,7 @@
 services:
   # Wireguard VPN - GUI Interface
   wg-easy:
-    image: ghcr.io/wg-easy/wg-easy
+    image: ghcr.io/wg-easy/wg-easy:14 # pinned: v15 ignores the WG_* env vars below
     container_name: wg-easy
     security_opt:
       - no-new-privileges:true
@@ -17,14 +17,12 @@ services:
       WG_DEFAULT_ADDRESS: 192.168.94.x
       WG_ALLOWED_IPS: 0.0.0.0/0, ::/0
       WG_POST_UP: >
-        iptables -t nat -A POSTROUTING -s 192.168.94.0/24 -d 192.168.1.2 -j SNAT --to-source 192.168.1.2;
-        iptables -t nat -A POSTROUTING -s 192.168.94.0/24 ! -d 192.168.1.2 -o eth0 -j MASQUERADE;
+        iptables -t nat -A POSTROUTING -s 192.168.94.0/24 -o eth0 -j MASQUERADE;
         iptables -A INPUT -p udp -m udp --dport 6006 -j ACCEPT;
         iptables -A FORWARD -i wg0 -j ACCEPT;
         iptables -A FORWARD -o wg0 -j ACCEPT;
       WG_POST_DOWN: >
-        iptables -t nat -D POSTROUTING -s 192.168.94.0/24 -d 192.168.1.2 -j SNAT --to-source 192.168.1.2;
-        iptables -t nat -D POSTROUTING -s 192.168.94.0/24 ! -d 192.168.1.2 -o eth0 -j MASQUERADE;
+        iptables -t nat -D POSTROUTING -s 192.168.94.0/24 -o eth0 -j MASQUERADE;
         iptables -D INPUT -p udp -m udp --dport 6006 -j ACCEPT;
         iptables -D FORWARD -i wg0 -j ACCEPT;
         iptables -D FORWARD -o wg0 -j ACCEPT;

@@ -3,7 +3,7 @@ services:
   tdarr-node1:
     image: haveagitgat/tdarr_node:latest
     container_name: tdarr-node1
-    restart: "no"
+    restart: unless-stopped
     devices:
       - /dev/dri:/dev/dri # for hardware transcoding
     networks:
