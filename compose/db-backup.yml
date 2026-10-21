@@ -1,0 +1,32 @@
+services:
+  # DB Backup - nightly consistent copies of the databases (03:30), picked up by the NAS backup afterwards.
+  # The script is scripts/db-backup.sh; the SQLite files to copy are listed in appdata/db-backups/sqlite.list.
+  db-backup:
+    container_name: db-backup
+    image: alpine:3.21
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - nextcloud # reaches mariadb
+    environment:
+      TZ: $TZ
+      PUID: $PUID
+      PGID: $PGID
+    command: >-
+      sh -c "apk add --no-cache mariadb-client sqlite tzdata >/dev/null &&
+      echo '30 3 * * * /scripts/db-backup.sh >> /backups/db-backup.log 2>&1' | crontab - &&
+      exec crond -f -l 8"
+    volumes:
+      - $DOCKERDIR/scripts/db-backup.sh:/scripts/db-backup.sh:ro
+      - $DOCKERDIR/appdata/db-backups:/backups
+      - $DOCKERDIR/appdata:/appdata # read through sqlite3 ".backup" only; rw because WAL readers need the -shm file
+    secrets:
+      - mysql_root_password
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"

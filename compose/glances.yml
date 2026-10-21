@@ -17,7 +17,9 @@ services:
       # - /var/run/docker.sock:/var/run/docker.sock:ro # Use Docker Socket Proxy instead for improved security
     environment:
       # GLANCES_OPT: "-C /glances/conf/glances.conf --quiet --export influxdb"
-      GLANCES_OPT: "-w"
+      # -t 10: refresh every 10 s instead of 2 s; with pid: host each refresh scans ~3,000 host processes
+      # plus every container, which spiked to ~77% CPU while the web UI was open
+      GLANCES_OPT: "-w -t 10"
       DOCKER_HOST: tcp://socket-proxy:2375
     labels:
       - "traefik.enable=true"

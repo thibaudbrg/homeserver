@@ -1,0 +1,29 @@
+services:
+  # Cloudflare Tunnel - the NAS opens the connection to Cloudflare, so visitors no longer need ports 80/443
+  # on the router. Added 2026-10-21: Cloudflare's Swiss edge reached the home IP with ~0.33 s RTT and packet loss.
+  # Routing is set on the tunnel itself through the Cloudflare API (tunnel "nas"), all with matchSNItoHost:
+  #   authelia, box, code, dsm, webdav .thibaudbrg-servers.me + the other domains whose routers have
+  #   their own tls labels (private apps)                                    -> https://192.168.91.1:443
+  #   thibaudbrg-servers.me, *.thibaudbrg-servers.me                         -> https://192.168.90.1:443
+  # Two origin addresses on purpose: cloudflared reuses connections across hostnames, and Traefik answers 421 when
+  # a connection opened for a tls-opts router serves a router on the default TLS options (the list above: routers
+  # with their own tls labels/section). A new router with its own tls config must join the first list.
+  # Both enter through the host's port 443: Traefik then sees 192.168.91.1, which it already trusts for
+  # X-Forwarded-For, so Authelia keeps seeing the real visitor IP.
+  cloudflared:
+    container_name: cloudflared
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    user: $PUID:$PGID # secrets are mode 600 files owned by $PUID
+    command: tunnel --no-autoupdate run --token-file /run/secrets/cf_tunnel_token
+    networks:
+      - traefik_network
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    secrets:
+      - cf_tunnel_token

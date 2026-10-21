@@ -10,6 +10,13 @@ services:
       - redis
     security_opt:
       - no-new-privileges:true
+    # json-file, not Synology's default "db" driver: on 2026-10-20 the db driver blocked Authelia's
+    # stdout, every logged request hung and all protected sites went down.
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     # ports:
     #   - "AUTHELIA_PORT:9091"
     volumes:
