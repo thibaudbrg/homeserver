@@ -1,0 +1,30 @@
+services:
+  # Sportarr - Sports events manager (like Sonarr, for sports). Indexers come from Prowlarr, where it is added as a
+  # Sonarr app (Prowlarr has no Sportarr type yet). Downloads: qBittorrent category "sports", library /data/media/sports.
+  sportarr:
+    image: sportarr/sportarr:latest
+    container_name: sportarr
+    restart: unless-stopped
+    networks:
+      traefik_network:
+        ipv4_address: 192.168.90.169
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/sportarr:/config
+      - $DATADIR/:/data/
+    environment:
+      TZ: $TZ
+      PUID: $PUID
+      PGID: $PGID
+      UMASK: "002"
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.sportarr-rtr.entrypoints=https"
+      - "traefik.http.routers.sportarr-rtr.rule=Host(`sportarr.$DOMAINNAME0`)"
+      ## Middlewares
+      - "traefik.http.routers.sportarr-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.sportarr-rtr.service=sportarr-svc"
+      - "traefik.http.services.sportarr-svc.loadbalancer.server.port=1867"

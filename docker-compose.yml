@@ -96,6 +96,10 @@ secrets:
     file: $DOCKERDIR/secrets/cf_token
   cf_tunnel_token:
     file: $DOCKERDIR/secrets/cf_tunnel_token
+  pia_username:
+    file: $DOCKERDIR/secrets/pia_username
+  pia_password:
+    file: $DOCKERDIR/secrets/pia_password
   oauth_secret:
     file: $DOCKERDIR/secrets/oauth_secret
   authelia_identity_validation_reset_password_jwt_secret_file:
@@ -155,6 +159,7 @@ include:
   - compose/guacd.yml
   # - compose/code-server.yml
   - compose/wg-easy.yml
+  - compose/adguard.yml
 
   # DATA & FILE MANAGEMENT
   - compose/vaultwarden.yml
@@ -179,7 +184,8 @@ include:
   - compose/threadfin.yml
 
   # MEDIA DOWNLOADERS
-  - compose/transmission-vpn.yml
+  # transmission-vpn retired 2026-10-22 (replaced by qBittorrent + gluetun), compose kept in archive/transmission-vpn.yml
+  - compose/qbittorrent.yml
   # - compose/nzbget.yml # archived 2026-10-11, see archive/nzbget.yml
   - compose/sabnzbd.yml
 
@@ -193,6 +199,9 @@ include:
   - compose/prowlarr.yml
   - compose/flaresolverr.yml
   - compose/ygege.yml
+  - compose/sportarr.yml
+  - compose/cleanuparr.yml
+  - compose/profilarr.yml
 
   # MEDIA UTILITIES
   - compose/notifiarr.yml

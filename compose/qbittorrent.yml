@@ -1,0 +1,91 @@
+services:
+  # Gluetun - VPN (PIA) for qBittorrent. Replaced transmission-vpn on 2026-10-22 (see archive/transmission-vpn.yml).
+  # qBittorrent has no network of its own, it lives inside gluetun's: if the VPN drops it has no internet at all
+  # (kill switch), so the home IP never reaches a peer. PIA login: secrets/pia_username + secrets/pia_password.
+  # Gluetun gets a forwarded port from PIA and pushes it into qBittorrent's API (allowed by qBittorrent's
+  # "bypass authentication for clients on localhost").
+  # Updated by hand, not by watchtower: recreating gluetun cuts qBittorrent off until it is recreated as well
+  # (docker-compose up -d --no-deps gluetun qbittorrent).
+  gluetun:
+    container_name: gluetun
+    image: qmcgaw/gluetun:v3.41.3
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    networks:
+      traefik_network:
+        ipv4_address: 192.168.90.166 # the arrs reach qBittorrent at gluetun:8080
+    volumes:
+      - $DOCKERDIR/appdata/gluetun:/gluetun
+    environment:
+      TZ: $TZ
+      VPN_SERVICE_PROVIDER: private internet access
+      VPN_TYPE: openvpn
+      OPENVPN_USER_SECRETFILE: /run/secrets/pia_username
+      OPENVPN_PASSWORD_SECRETFILE: /run/secrets/pia_password
+      SERVER_REGIONS: France
+      PORT_FORWARD_ONLY: "on"
+      VPN_PORT_FORWARDING: "on"
+      VPN_PORT_FORWARDING_UP_COMMAND: >-
+        /bin/sh -c 'wget -O- --retry-connrefused --post-data "json={\"listen_port\":{{PORTS}}}" http://127.0.0.1:8080/api/v2/app/setPreferences 2>&1'
+      HTTP_CONTROL_SERVER_ADDRESS: "127.0.0.1:8000" # its API has no login (it can stop the VPN), keep it inside the container
+    secrets:
+      - pia_username
+      - pia_password
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+      - "traefik.enable=true"
+      ## HTTP Routers (qBittorrent's web UI, served through gluetun's network)
+      # bypass: apps sending "Authorization: Bearer <QBITTORRENT_API_KEY>" skip Authelia. qBittorrent checks the key
+      # as well (with a Bearer header it ignores its Traefik whitelist). ":?" stops compose if the key is missing.
+      - "traefik.http.routers.qbittorrent-rtr-bypass.entrypoints=https"
+      - "traefik.http.routers.qbittorrent-rtr-bypass.rule=Host(`qbit.$DOMAINNAME0`) && Header(`Authorization`, `Bearer ${QBITTORRENT_API_KEY:?missing from .env}`)"
+      - "traefik.http.routers.qbittorrent-rtr-bypass.priority=100"
+      - "traefik.http.routers.qbittorrent-rtr.entrypoints=https"
+      - "traefik.http.routers.qbittorrent-rtr.rule=Host(`qbit.$DOMAINNAME0`)"
+      - "traefik.http.routers.qbittorrent-rtr.priority=99"
+      ## Middlewares
+      - "traefik.http.routers.qbittorrent-rtr-bypass.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.qbittorrent-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.qbittorrent-rtr.service=qbittorrent-svc"
+      - "traefik.http.routers.qbittorrent-rtr-bypass.service=qbittorrent-svc"
+      - "traefik.http.services.qbittorrent-svc.loadbalancer.server.port=8080"
+
+  # qBittorrent - Torrent downloader, VueTorrent web UI (mobile friendly) added by the docker mod.
+  # Web login: secrets/qbittorrent_password (user thibaudbrg), skipped for Traefik's address since Authelia is in front.
+  # Apps: API key (QBITTORRENT_API_KEY in .env) through the qbit bypass route on gluetun.
+  qbittorrent:
+    container_name: qbittorrent
+    image: lscr.io/linuxserver/qbittorrent:latest
+    restart: unless-stopped
+    network_mode: service:gluetun
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/qbittorrent:/config
+      - $DATADIR/torrents:/data/torrents
+    environment:
+      TZ: $TZ
+      PUID: $PUID
+      PGID: $PGID
+      UMASK: "002"
+      WEBUI_PORT: 8080
+      DOCKER_MODS: ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

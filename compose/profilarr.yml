@@ -1,0 +1,47 @@
+services:
+  # Profilarr - Syncs quality profiles and custom formats (TRaSH Guides, French MULTi branch) into Radarr and Sonarr.
+  # Replaces Notifiarr's TRaSH sync. Linked databases are git repos cloned into /config.
+  profilarr:
+    image: ghcr.io/dictionarry-hub/profilarr:2
+    container_name: profilarr
+    restart: unless-stopped
+    networks:
+      traefik_network:
+        ipv4_address: 192.168.90.172
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/profilarr:/config
+    environment:
+      TZ: $TZ
+      PUID: $PUID
+      PGID: $PGID
+      UMASK: "002"
+      ORIGIN: https://profilarr.$DOMAINNAME0
+      PARSER_HOST: profilarr-parser
+      PARSER_PORT: 5000
+    depends_on:
+      - profilarr-parser
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.profilarr-rtr.entrypoints=https"
+      - "traefik.http.routers.profilarr-rtr.rule=Host(`profilarr.$DOMAINNAME0`)"
+      ## Middlewares
+      - "traefik.http.routers.profilarr-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.profilarr-rtr.service=profilarr-svc"
+      - "traefik.http.services.profilarr-svc.loadbalancer.server.port=6868"
+
+  # Release-name parser used by Profilarr's custom format / profile testing (not reachable from outside).
+  profilarr-parser:
+    image: ghcr.io/dictionarry-hub/profilarr-parser:2
+    container_name: profilarr-parser
+    restart: unless-stopped
+    networks:
+      traefik_network:
+        ipv4_address: 192.168.90.173
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      TZ: $TZ

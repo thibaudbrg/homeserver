@@ -22,7 +22,9 @@ services:
       - DOCKER_HOST=tcp://socket-proxy:2375
     secrets:
       - cf_token # must have this particular name
-      #labels:
-      # Add hosts specified in rules here to force cf-companion to create the CNAMEs
-      # Since cf-companion creates CNAMEs based on host rules, this a workaround for non-docker/external apps
+    labels:
+      # Hosts routed by Traefik file rules (appdata/traefik/rules) have no container labels, so cf-companion can't see
+      # them: list them here to get their CNAME. No traefik.enable label, so Traefik ignores this router.
+      - "traefik.http.routers.cf-companion-rtr.rule=Host(`adguard.$DOMAINNAME0`)"
+      # Original example from the template:
       #- "traefik.http.routers.cf-companion-rtr.rule=Host(`webminh.$DOMAINNAME0`) || Host(`shellh.$DOMAINNAME0`) || Host(`syno.$DOMAINNAME0`) || Host(`ibox.$DOMAINNAME0`) || Host(`synplex.$DOMAINNAME0`) || Host(`pirpi.$DOMAINNAME0`) || Host(`pidoc.$DOMAINNAME0` || Host(`stpc.$DOMAINNAME0`)"

@@ -1,0 +1,18 @@
+services:
+  # AdGuard Home - DNS ad/tracker blocking for the whole LAN (the Bbox hands out the NAS as DNS) and WireGuard clients.
+  # Host network: DNS listens on the NAS IP (53 tcp/udp) and logs the real client IPs (bridge mode would show
+  # the Docker gateway for every device). First start: setup wizard on http://<NAS IP>:3000, admin UI then on 3053.
+  # Web UI through Traefik: file rule appdata/traefik/rules/adguard.yml (Traefik can't route host-network
+  # containers from labels).
+  adguard:
+    image: adguard/adguardhome:latest
+    container_name: adguard
+    restart: unless-stopped
+    network_mode: host
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/adguard/work:/opt/adguardhome/work
+      - $DOCKERDIR/appdata/adguard/conf:/opt/adguardhome/conf
+    environment:
+      TZ: $TZ

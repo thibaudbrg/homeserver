@@ -1,0 +1,31 @@
+services:
+  # Cleanuparr - Removes stalled, stuck, failed-import and malware downloads from qBittorrent, blocklists them in the
+  # arrs and searches again. Private-tracker torrents are never deleted from qBittorrent (seeding/ratio stays safe).
+  # Only talks to the APIs, so no data folder is mounted.
+  cleanuparr:
+    image: ghcr.io/cleanuparr/cleanuparr:latest
+    container_name: cleanuparr
+    restart: unless-stopped
+    networks:
+      traefik_network:
+        ipv4_address: 192.168.90.171
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/cleanuparr:/config
+    environment:
+      TZ: $TZ
+      PUID: $PUID
+      PGID: $PGID
+      UMASK: "002"
+      PORT: 11011
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.cleanuparr-rtr.entrypoints=https"
+      - "traefik.http.routers.cleanuparr-rtr.rule=Host(`cleanuparr.$DOMAINNAME0`)"
+      ## Middlewares
+      - "traefik.http.routers.cleanuparr-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.cleanuparr-rtr.service=cleanuparr-svc"
+      - "traefik.http.services.cleanuparr-svc.loadbalancer.server.port=11011"
