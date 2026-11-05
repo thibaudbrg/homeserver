@@ -23,13 +23,23 @@ services:
       - $DOCKERDIR/appdata/gluetun:/gluetun
     environment:
       TZ: $TZ
-      VPN_SERVICE_PROVIDER: private internet access
-      VPN_TYPE: openvpn
-      OPENVPN_USER_SECRETFILE: /run/secrets/pia_username
-      OPENVPN_PASSWORD_SECRETFILE: /run/secrets/pia_password
-      SERVER_REGIONS: France
-      PORT_FORWARD_ONLY: "on"
+      # PIA over WireGuard (kernel module from the Synology WireGuard package): gluetun has no native PIA WireGuard,
+      # so it runs as a "custom" provider reading /gluetun/wireguard/wg0.conf, made by scripts/pia-wg-setup.py (fastest
+      # French port-forwarding server; vpn-watchdog below reruns it when the tunnel dies). OpenVPN topped out at ~25 MB/s (one core).
+      VPN_SERVICE_PROVIDER: custom
+      VPN_TYPE: wireguard
+      SERVER_NAMES: Server-10775-2a # PIA server name from appdata/gluetun/wireguard/server.txt, needed for port forwarding
       VPN_PORT_FORWARDING: "on"
+      VPN_PORT_FORWARDING_PROVIDER: private internet access
+      VPN_PORT_FORWARDING_USERNAME_SECRETFILE: /run/secrets/pia_username
+      VPN_PORT_FORWARDING_PASSWORD_SECRETFILE: /run/secrets/pia_password
+      # OpenVPN fallback (swap these back in for the 7 lines above):
+      # VPN_SERVICE_PROVIDER: private internet access
+      # VPN_TYPE: openvpn
+      # OPENVPN_USER_SECRETFILE: /run/secrets/pia_username
+      # OPENVPN_PASSWORD_SECRETFILE: /run/secrets/pia_password
+      # SERVER_REGIONS: France
+      # PORT_FORWARD_ONLY: "on"
       VPN_PORT_FORWARDING_UP_COMMAND: >-
         /bin/sh -c 'wget -O- --retry-connrefused --post-data "json={\"listen_port\":{{PORTS}}}" http://127.0.0.1:8080/api/v2/app/setPreferences 2>&1'
       HTTP_CONTROL_SERVER_ADDRESS: "127.0.0.1:8000" # its API has no login (it can stop the VPN), keep it inside the container
@@ -89,3 +99,43 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+
+  # VPN watchdog - every 5 min, checks gluetun's log. When the tunnel stays down (PIA dropped our WireGuard key,
+  # 2026-11-04), registers a new key (scripts/pia-wg-setup.py), restarts gluetun then qBittorrent, reports on Telegram.
+  # The script is scripts/vpn-watchdog.py; its last run is in this container's log.
+  vpn-watchdog:
+    container_name: vpn-watchdog
+    image: alpine:3.21
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - default # internet (PIA API, Telegram)
+      - socket_proxy # restarts gluetun and qbittorrent
+    environment:
+      TZ: $TZ
+      PUID: $PUID
+      PGID: $PGID
+      DOCKER_HOST: tcp://socket-proxy:2375
+      PIA_SECRETS: /run/secrets
+      PIA_WG_DIR: /wireguard
+      TGRAM_BOT_TOKEN: $TGRAM_BOT_TOKEN
+      TGRAM_CHAT_ID: $TGRAM_CHAT_ID
+    command: >-
+      sh -c "apk add --no-cache python3 py3-cryptography tzdata >/dev/null &&
+      echo '*/5 * * * * python3 /scripts/vpn-watchdog.py > /proc/1/fd/1 2>&1' | crontab - &&
+      exec crond -f -l 8"
+    volumes:
+      - $DOCKERDIR/scripts/vpn-watchdog.py:/scripts/vpn-watchdog.py:ro
+      - $DOCKERDIR/scripts/pia-wg-setup.py:/scripts/pia-wg-setup.py:ro
+      - $DOCKERDIR/appdata/gluetun/wireguard:/wireguard
+    secrets:
+      - pia_username
+      - pia_password
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"

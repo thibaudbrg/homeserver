@@ -204,7 +204,7 @@ include:
   - compose/profilarr.yml
 
   # MEDIA UTILITIES
-  - compose/notifiarr.yml
+  # - compose/notifiarr.yml # archived 2026-10-30, see archive/notifiarr.yml (TRaSH sync replaced by Profilarr)
 
   # MEDIA CONVERSION TOOLS
   # - compose/lrcget.yml

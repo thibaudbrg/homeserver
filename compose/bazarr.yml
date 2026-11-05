@@ -8,6 +8,10 @@ services:
       - traefik_network
     security_opt:
       - no-new-privileges:true
+    # Subtitle sync runs ffmpeg over each movie's audio: keep it on 2 of the NAS's 4 cores and behind Plex for CPU.
+    # (Synology's kernel has no CFS quota, so "cpus:" is refused; cpuset and cpu_shares work.)
+    cpuset: "2,3"
+    cpu_shares: 512
     # ports: no longer published (2026-10-11), reached through Traefik or by container name
     volumes:
       - $DOCKERDIR/appdata/bazarr:/config

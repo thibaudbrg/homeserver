@@ -19,7 +19,8 @@ This setup does not require external network configurations outside of what is d
 - **Traefik** : Reverse proxy and load balancer with automatic SSL certificate management. 
 - **Authelia** : Full-featured authentication server providing 2FA and SSO. 
 - **Portainer** : Docker container management. 
-- **Socket-Proxy** : Secure proxy for Docker API.
+- **Socket-Proxy** : Secure proxy for Docker API. 
+- **Cloudflared** : Cloudflare Tunnel, exposes the services without opening ports on the router.
 ### Monitoring and Logging 
 - **Dozzle** : Real-time log monitoring. 
 - **Glances** : System monitoring. 
@@ -27,27 +28,29 @@ This setup does not require external network configurations outside of what is d
 ### Data and File Management 
 - **Vaultwarden** : Secure password storage. 
 - **Nextcloud** : Personal cloud storage and office solution. 
-- **PhotoPrism** : Photo management and sharing. 
 - **Immich** : Self-hosted photo and video management with mobile app support and machine learning features. 
 - **MariaDB and phpMyAdmin** : Database management solutions. 
+- **DB Backup** : Nightly dumps of the databases, picked up by the NAS backup. 
 - **Redis** : Advanced key-value store. 
 - **Redis Commander** : Redis database management. 
 - **FileBrowser** : Web-based file manager. 
 - **Qdrant** : Vector search engine.
 ### Media Servers 
 - **Plex** : Media streaming platform including `plextraktsync` for syncing watched status and `Tautulli` for monitoring and statistics. 
-- **Overseerr** : Media request and management tool for Plex and Emby servers.
+- **Seerr** : Media request and management tool for Plex (replaces Overseerr).
 ### IPTV 
 - **Threadfin** : M3U proxy server for Plex, Emby, and Jellyfin with EPG support and stream filtering.
 ### Downloaders and Indexers 
-- **Transmission with VPN** : Secure torrent downloading. 
-- **NZBGet and SABnzbd** : Usenet downloading. 
+- **qBittorrent with Gluetun** : Torrent downloading through a VPN with kill switch and port forwarding, plus a small watchdog that repairs the tunnel when it drops. 
+- **SABnzbd** : Usenet downloading. 
 - **Sonarr, Radarr, Lidarr, Readarr, Bazarr, Prowlarr** : Media management for TV shows, movies, music, books, and subtitles. 
 - **Tidarr** : Tidal music downloader with Lidarr integration for high-quality streaming music downloads. 
 - **Ygege** : YGG torrent indexer integration for French content. 
+- **Sportarr** : Media management for sports events. 
+- **Profilarr** : Keeps quality profiles and custom formats in sync across Radarr and Sonarr. 
+- **Cleanuparr** : Cleans stalled and failed downloads from the queues. 
 - **Flaresolverr** : Solves CAPTCHAs and manages Cloudflare challenges.
 ### Media Utilities 
-- **Notifiarr** : Unified notification client for Sonarr, Radarr, Lidarr, and other *arr applications. 
 - **LRCGet** : Automatic synced lyrics fetching for music library with Redis caching support.
 ### Media Conversion Tools 
 - **Handbrake** : Video transcoding. 
@@ -57,10 +60,10 @@ This setup does not require external network configurations outside of what is d
 - **Guacamole** : Clientless remote desktop gateway with support for VNC, RDP, and SSH. 
 - **Guacd** : Guacamole proxy daemon that handles all remote desktop protocol connections. 
 - **WireGuard (wg-easy)** : Simple and fast VPN with an easy-to-use web interface for managing connections. 
+- **AdGuard Home** : Network-wide DNS ad and tracker blocking. 
 - **Code-Server** : VS Code running in the browser for remote development.
 ### System Maintenance 
 - **Watchtower** : Automatic updating of Docker containers. 
-- **Docker-GC** : Garbage collection of unused Docker images and containers. 
 - **Ofelia** : A job scheduler that is a replacement for cron. 
 - **Cloudflare Companion** : Automatic CNAME creation for services.
 ### AI and Machine Learning 
