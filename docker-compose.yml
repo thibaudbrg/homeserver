@@ -202,6 +202,7 @@ include:
   - compose/sportarr.yml
   - compose/cleanuparr.yml
   - compose/profilarr.yml
+  - compose/arr-french-import.yml
 
   # MEDIA UTILITIES
   # - compose/notifiarr.yml # archived 2026-10-30, see archive/notifiarr.yml (TRaSH sync replaced by Profilarr)
